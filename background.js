@@ -45,10 +45,10 @@ if (started=="on")
 // listen for change in configuration or start/stop 
 browser.runtime.onMessage.addListener(notify);
 
+
 /*
 * Rewrite the header (add , modify or delete)
 *
-* 
 */
 function rewriteHeader(e) 
 {
@@ -59,7 +59,6 @@ function rewriteHeader(e)
 			{
 			if (to_modify[0]=="add")  
 				{
-					console.log("add = " + to_modify[1]);
 					var new_header = {"name" :to_modify[1],"value":to_modify[2]};
 					e.requestHeaders.push(new_header);
 				}
