@@ -1,16 +1,16 @@
 {
 
-  "description": "Modify header nouvelle version ",
+  "description": "Simple Modify header ",
   "manifest_version": 2,
-  "name": "modify-header-2",
-  "version": "0.1",
+  "name": "simple-modify-header",
+  "version": "1",
   "homepage_url": "https://a_defenirnir",
   "icons": {
-    "48": "icons/person-48.png"
+    "48": "icons/modify-48.png"
   },
 
   "permissions": [
-    "activeTab","storage","webRequest", "webRequestBlocking", "https://httpbin.org/*" 
+    "activeTab","storage","webRequest", "webRequestBlocking", "<all_urls>" 
   ],
   
   "background": {
@@ -18,7 +18,7 @@
   },
 
   "browser_action": {
-    "default_icon": "icons/person-32.png",
+    "default_icon": "icons/modify-32.png",
     "default_title": "Modify a header",
     "default_popup": "popup/config.html"
   }

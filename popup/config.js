@@ -2,7 +2,11 @@
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+ *
+ * @author didierfred@gmail.com
+ * @version 0.1
+ */
 
 
 var line_number = 1;
@@ -25,7 +29,7 @@ function appendLine(action,header_name,header_value,status) {
 var html = "<td><select id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
 html = html + "<td><input id=\"header_name"+ line_number +"\" value=\"" + header_name + "\"></input></td>";
 html = html + "<td><input id=\"header_value"+ line_number +"\" value=\"" + header_value + "\"></input></td>";
-html = html + "<td><select id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
+html = html + "<td><select id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
 html = html + "<td><input type=\"button\" value=\"DELETE\" id=\"delete_button" + line_number + "\"></input> </td>";
 
 var newTR = document.createElement("tr");

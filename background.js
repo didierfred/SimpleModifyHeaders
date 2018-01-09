@@ -1,7 +1,11 @@
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+ *
+ * @author didierfred@gmail.com
+ * @version 0.1
+ */
 
 
 "use strict";
@@ -31,18 +35,24 @@ else targetPage = localStorage.getItem('targetPage');
 if (!localStorage.getItem('started')) localStorage.setItem('started',started);
 else started = localStorage.getItem('started');
 
-if (started=="on") addListener();
+if (started=="on") 
+		{
+		addListener();
+		browser.browserAction.setIcon({ path: "icons/modify-green-32.png"});
+		}
 
 
 // listen for change in configuration or start/stop 
 browser.runtime.onMessage.addListener(notify);
 
-/**
-Rewrite the header
-**/
-function rewriteHeader(e) {
-  
-  window.console.info("IT Works");
+/*
+* Rewrite the header (add , modify or delete)
+*
+* 
+*/
+function rewriteHeader(e) 
+{
+
   for (var to_modify of modifyTable)
 	{
 		if (to_modify[3]=="on")
@@ -81,7 +91,13 @@ function rewriteHeader(e) {
 
 
 
-
+/*
+* Listen for message form config.js
+* if message is reload : reload the configuration 
+* if message is on : start the modify header 
+* if message is off : stop the modify header
+*
+**/
 function notify(message) 
 	{
 	if (message=="reload") 
@@ -98,21 +114,21 @@ function notify(message)
 	else if (message=="off")
 		{
 		browser.webRequest.onBeforeSendHeaders.removeListener(rewriteHeader);
+		browser.browserAction.setIcon({ path: "icons/modify-32.png"});
 		started="off";
 		}
 
 	else if (message=="on")
 		{
 		addListener();
+		browser.browserAction.setIcon({ path: "icons/modify-green-32.png"});
 		started="on";
 		}
   	}
 
 /*
-Add rewriteHeader as a listener to onBeforeSendHeaders,
-only for the target page.
-
-Make it "blocking" so we can modify the headers.
+* Add rewriteHeader as a listener to onBeforeSendHeaders, only for the target page.
+* Make it "blocking" so we can modify the headers.
 */
 function addListener()
 	{
