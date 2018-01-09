@@ -73,7 +73,6 @@ function delete_line(line_number_to_delete)
 			for (i=line_number_to_delete;i<line_number-1;i++)
 				{
 				var j = i+1;
-				console.log("i=" + i + ",j=" + j); 
 				document.getElementById("select_action"+i).value = document.getElementById("select_action"+j).value;
 				document.getElementById("header_name"+i).value = document.getElementById("header_name"+j).value;
 				document.getElementById("header_value"+i).value = document.getElementById("header_value"+j).value;
