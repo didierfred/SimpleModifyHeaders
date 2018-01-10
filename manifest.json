@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "name": "simple-modify-header",
   "version": "1",
-  "homepage_url": "https://github.com/didierfred/SimpleModifyHeader",
+  "homepage_url": "https://github.com/didierfred/SimpleModifyHeaders",
   "icons": {
     "48": "icons/modify-48.png"
   },
@@ -19,7 +19,7 @@
 
   "browser_action": {
     "default_icon": "icons/modify-32.png",
-    "default_title": "Simple Modify Header",
+    "default_title": "Simple Modify Headers",
     "default_popup": "popup/config.html"
   }
 

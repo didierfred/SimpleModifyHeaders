@@ -1,8 +1,8 @@
-# SimpleModifyHeader
+# SimpleModifyHeaders
 
 Extension for firefox . 
 
-The extension rewrite the header based on a rules table. 
+The extension rewrite the headers based on a rules table. 
 
 The rules table contains lines with the following parameters :
 - action : add, modify or delete a header field
