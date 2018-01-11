@@ -1,8 +1,8 @@
 {
 
-  "description": "Simple Modify header ",
+  "description": "Simple Modify headers ",
   "manifest_version": 2,
-  "name": "simple-modify-header",
+  "name": "simple-modify-headers",
   "version": "1",
   "homepage_url": "https://github.com/didierfred/SimpleModifyHeaders",
   "icons": {
