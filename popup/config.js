@@ -27,8 +27,8 @@ window.onload = function() {
 function appendLine(action,header_name,header_value,status) {
 
 var html = "<td><select id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
-html = html + "<td><input id=\"header_name"+ line_number +"\" value=\"" + header_name + "\"></input></td>";
-html = html + "<td><input id=\"header_value"+ line_number +"\" value=\"" + header_value + "\"></input></td>";
+html = html + "<td><input id=\"header_name"+ line_number + "\"></input></td>";
+html = html + "<td><input id=\"header_value"+ line_number + "\"></input></td>";
 html = html + "<td><select id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
 html = html + "<td><input type=\"button\" value=\"DELETE\" id=\"delete_button" + line_number + "\"></input> </td>";
 
@@ -38,6 +38,8 @@ newTR.innerHTML = html;
 document.getElementById("config_tab").appendChild(newTR);
 document.getElementById("select_action"+line_number).value = action;
 document.getElementById("select_status"+line_number).value = status;
+document.getElementById("header_name"+line_number).value = header_name;
+document.getElementById("header_value"+line_number).value = header_value;
 var line_number_to_delete = line_number;
 document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {delete_line(line_number_to_delete)});
 line_number++;
