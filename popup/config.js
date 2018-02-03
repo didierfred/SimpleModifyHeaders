@@ -16,6 +16,8 @@ window.onload = function() {
 	var configTable = JSON.parse(localStorage.getItem("modifyTable"));	
 	for (var to_add of configTable) appendLine(to_add[0],to_add[1],to_add[2],to_add[3]);
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
+	document.getElementById('export_button').addEventListener('click',function (e) {export_data();});
+	document.getElementById('import_button').addEventListener('click',function (e) {import_data(e);});
 	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","off");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=localStorage.getItem("targetPage");
@@ -66,7 +68,37 @@ function save_data ()
 	browser.runtime.sendMessage("reload");
 	}
 
+function export_data()
+	{
+	// Create file data
+	var tr_elements = document.querySelectorAll("#config_tab tr");
+	var headers = [];
+	for (i=1;i<tr_elements.length;i++)  // ignore line 1 which is the table header
+		{
+	
+		var action = tr_elements[i].childNodes[0].childNodes[0].value;
+		var header_name = tr_elements[i].childNodes[1].childNodes[0].value;
+		var header_value = tr_elements[i].childNodes[2].childNodes[0].value;
+		var status = tr_elements[i].childNodes[3].childNodes[0].value;
+		headers.push({action:action,header_name:header_name,header_value:header_value,status:status});
 
+		}
+	var to_export = {format_version:"1.0",targetPage:document.getElementById('targetPage').value,headers:headers};
+	console.log(JSON.stringify(to_export));
+	
+	// Create file to save 
+	var a         = document.createElement('a');
+	a.href        = 'data:attachment/json,' +  encodeURIComponent(JSON.stringify(to_export));
+	a.target      = '_blank';
+	a.download    = 'SimpleModifyHeader.conf';
+	document.body.appendChild(a);
+	a.click();
+	}
+	
+function import_data(evt)
+	{
+		var files = evt.target.files; 
+	}
 
 function delete_line(line_number_to_delete)
 	{
