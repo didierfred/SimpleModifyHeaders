@@ -48,8 +48,6 @@ line_number++;
 }
 
 
-
-
 function save_data () 
 	{
 	var tr_elements = document.querySelectorAll("#config_tab tr");
@@ -83,22 +81,71 @@ function export_data()
 		headers.push({action:action,header_name:header_name,header_value:header_value,status:status});
 
 		}
-	var to_export = {format_version:"1.0",targetPage:document.getElementById('targetPage').value,headers:headers};
+	var to_export = {format_version:"1.0",target_page:document.getElementById('targetPage').value,headers:headers};
 	console.log(JSON.stringify(to_export));
 	
 	// Create file to save 
 	var a         = document.createElement('a');
 	a.href        = 'data:attachment/json,' +  encodeURIComponent(JSON.stringify(to_export));
-	a.target      = '_blank';
+	a.target      = 'download';
 	a.download    = 'SimpleModifyHeader.conf';
-	document.body.appendChild(a);
+	
+	// use iframe "download" to put the link (in order not to be redirect in the parent frame)
+	var myf = document.getElementById("download");
+	myf = myf.contentWindow.document || myf.contentDocument;
+	myf.body.appendChild(a);
 	a.click();
 	}
 	
 function import_data(evt)
 	{
-		var files = evt.target.files; 
+	// create an input field in the iframe
+	var input = document.createElement("input");
+	input.type="file";
+	input.addEventListener('change', readSingleFile, false);
+	var myf = document.getElementById("download");
+	myf = myf.contentWindow.document || myf.contentDocument;
+	myf.body.appendChild(input);
+	input.click();
 	}
+
+function readSingleFile(e) 
+	{
+	  var file = e.target.files[0];
+	  if (!file) {
+    		return;
+  		}
+  	  var reader = new FileReader();
+  	  reader.onload = function(e) 
+		{
+    		var contents = e.target.result;
+		var config="";	
+		try
+			{
+			config = JSON.parse(contents);
+			if (config.format_version && config.target_page)
+				{
+				alert("ok");
+				// store the conf in the local storage 
+				localStorage.setItem("config",contents);
+				// load the new conf 
+				browser.runtime.sendMessage("reload");
+				// reload the configuration page with the new conf
+				document.location.href="config.html";
+				}
+			else alert("invalid file format");
+			}
+		catch(error) 
+			{
+  			console.log(error);
+			alert("Invalid file format");
+			}
+		alert(contents);
+  		};
+  	reader.readAsText(file);
+	}
+
+
 
 function delete_line(line_number_to_delete)
 	{
