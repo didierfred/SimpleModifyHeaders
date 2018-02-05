@@ -17,7 +17,7 @@ window.onload = function() {
 	for (var to_add of configTable) appendLine(to_add[0],to_add[1],to_add[2],to_add[3]);
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
 	document.getElementById('export_button').addEventListener('click',function (e) {export_data();});
-	document.getElementById('import_button').addEventListener('click',function (e) {import_data(e);});
+	document.getElementById('import_button').addEventListener('change',function (e) {import_data(e);});
 	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","off");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=localStorage.getItem("targetPage");
@@ -97,7 +97,16 @@ function export_data()
 	
 function import_data(evt)
 	{
-		var files = evt.target.files; 
+		var files = evt.target.files;
+        var reader = new FileReader();
+        reader.addEventListener('load', function() {
+			console.log("files[0].name=" + files[0].name);
+            alert('Contenu du fichier : "' + files[0].name + '" :\n\n' + reader.result);
+
+        });
+        reader.readAsText(files[0]);
+
+ 
 	}
 
 function delete_line(line_number_to_delete)
