@@ -31,7 +31,7 @@ else
 			var modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
 			for (var to_modify of modifyTable)
 				{
-					headers.push({action:to_modify[0],header_name:to_modify[1],header_value:to_modify[2],status:to_modify[3]});
+					headers.push({action:to_modify[0],header_name:to_modify[1],header_value:to_modify[2],comment:"",status:to_modify[3]});
 				}
 			config = {format_version:"1.0",target_page:localStorage.getItem('targetPage'),headers:headers};
 			// save old config in new format 
@@ -42,7 +42,7 @@ else
 		{
 				console.log("Load default config");
 				var headers = [];
-				headers.push({action:"add",header_name:"test_header_name",header_value:"test_header_value",status:"on"});
+				headers.push({action:"add",header_name:"test_header_name",header_value:"test_header_value",comment:"test",status:"on"});
 				config = {format_version:"1.0",target_page:"https://httpbin.org/*",headers:headers};
 				// save configuration 
 				localStorage.setItem("config",JSON.stringify(config));
