@@ -10,27 +10,46 @@
 
 "use strict";
 
-var targetPage = "https://httpbin.org/*";
-var modifyTable = [];
+//var targetPage = "https://httpbin.org/*";
+//var modifyTable = [];
+var config ;
 var started = "off";
 
-// If no table stored , use and store a default one
-if (!localStorage.getItem('modifyTable')) 
+// if configuration exist 
+if (localStorage.getItem('config'))  
 	{
-	modifyTable = [
-		["add","test_header_name","test_header_value","on"],
-		];
-	localStorage.setItem("modifyTable",JSON.stringify(modifyTable));
+	console.log("Load standard config");
+	config= JSON.parse(localStorage.getItem('config'));
 	}
 else 
 	{
-	modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
+	// else check if old config exist
+	if (localStorage.getItem('targetPage')&& localStorage.getItem('modifyTable'))
+		{
+			console.log("Load old config");
+			var headers = [];
+			var modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
+			for (var to_modify of modifyTable)
+				{
+					headers.push({action:to_modify[0],header_name:to_modify[1],header_value:to_modify[2],status:to_modify[3]});
+				}
+			config = {format_version:"1.0",target_page:localStorage.getItem('targetPage'),headers:headers};
+			// save old config in new format 
+			localStorage.setItem("config",JSON.stringify(config));
+		}
+	//else no config exists, create a default one
+	else 
+		{
+				console.log("Load default config");
+				var headers = [];
+				headers.push({action:"add",header_name:"test_header_name",header_value:"test_header_value",status:"on"});
+				config = {format_version:"1.0",target_page:"https://httpbin.org/*",headers:headers};
+				// save configuration 
+				localStorage.setItem("config",JSON.stringify(config));
+		}
 	}
-
-// If no target page stored , use a default one 
-if (!localStorage.getItem('targetPage')) localStorage.setItem('targetPage',targetPage);
-else targetPage = localStorage.getItem('targetPage');
-
+		
+		
 // If no started value stored , use a default one 
 if (!localStorage.getItem('started')) localStorage.setItem('started',started);
 else started = localStorage.getItem('started');
@@ -40,7 +59,6 @@ if (started=="on")
 		addListener();
 		browser.browserAction.setIcon({ path: "icons/modify-green-32.png"});
 		}
-
 
 // listen for change in configuration or start/stop 
 browser.runtime.onMessage.addListener(notify);
@@ -53,29 +71,29 @@ browser.runtime.onMessage.addListener(notify);
 function rewriteHeader(e) 
 {
 
-  for (var to_modify of modifyTable)
+  for (var to_modify of config.headers)
 	{
-		if (to_modify[3]=="on")
+		if (to_modify.status=="on")
 			{
-			if (to_modify[0]=="add")  
+			if (to_modify.action=="add")  
 				{
-					var new_header = {"name" :to_modify[1],"value":to_modify[2]};
+					var new_header = {"name" :to_modify.header_name,"value":to_modify.header_value};
 					e.requestHeaders.push(new_header);
 				}
-			else if (to_modify[0]=="modify")
+			else if (to_modify.action=="modify")
 				{
 				for (var header of e.requestHeaders) 
 					{
-					if (header.name.toLowerCase() == to_modify[1].toLowerCase()) header.value = to_modify[2];
+					if (header.name.toLowerCase() == to_modify.header_name.toLowerCase()) header.value = to_modify.header_value;
 					}
 				}
-			else if (to_modify[0]=="delete")
+			else if (to_modify.action=="delete")
 				{
 				var index = -1;
 			
 				for (var i=0; i < e.requestHeaders.length; i++)
 					{
-				 	if (e.requestHeaders[i].name.toLowerCase() == to_modify[1].toLowerCase())  index=i;
+				 	if (e.requestHeaders[i].name.toLowerCase() == to_modify.header_name.toLowerCase())  index=i;
 					}
 				if (index!=-1) 
 					{
@@ -101,8 +119,7 @@ function notify(message)
 	{
 	if (message=="reload") 
 		{
-		modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
-		targetPage = localStorage.getItem('targetPage');
+		config=JSON.parse(localStorage.getItem("config"));
 		if (started=="on")
 			{		
 			browser.webRequest.onBeforeSendHeaders.removeListener(rewriteHeader);
@@ -132,7 +149,7 @@ function notify(message)
 function addListener()
 	{
 	browser.webRequest.onBeforeSendHeaders.addListener(rewriteHeader,
-                                          {urls: [targetPage]},
+                                          {urls: [config.target_page]},
                                           ["blocking", "requestHeaders"]);
 	}
 
