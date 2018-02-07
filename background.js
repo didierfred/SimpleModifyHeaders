@@ -148,8 +148,11 @@ function notify(message)
 */
 function addListener()
 	{
+	var target = config.target_page;
+	if ((target=="*")||(target=="")||(target==" "))target="<all_urls>";
+	
 	browser.webRequest.onBeforeSendHeaders.addListener(rewriteHeader,
-                                          {urls: [config.target_page]},
+                                          {urls: [target]},
                                           ["blocking", "requestHeaders"]);
 	}
 

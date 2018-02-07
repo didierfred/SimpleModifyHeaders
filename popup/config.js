@@ -69,8 +69,23 @@ function create_configuration_data()
 	return JSON.stringify(to_export);
 }
 
+// check if url pattern is valid
+function isTargetValid(target)
+	{
+		if (target=="") return true;
+		if (target==" ") return true;
+		if (target=="*") return true;
+		return target.match("(http|https):\/\/.[^\*]*\/");
+	}
+
+
 function save_data () 
 	{
+	if (!isTargetValid(document.getElementById('targetPage').value))
+		{
+			alert("Url pattern  is invalid");
+			return;
+		}
 	localStorage.setItem("config",create_configuration_data());
 	browser.runtime.sendMessage("reload");
 	}
@@ -113,18 +128,19 @@ function import_data(evt)
 
 function readSingleFile(e) 
 	{
-	  var file = e.target.files[0];
-	  if (!file) {
+	var file = e.target.files[0];
+	if (!file) {
     		return;
   		}
-  	  var reader = new FileReader();
-  	  reader.onload = function(e) 
+  	var reader = new FileReader();
+  	reader.onload = function(e) 
 		{
     	var contents = e.target.result;
 		var config="";	
 		try
 			{
 			config = JSON.parse(contents);
+			// check file format
 			if (config.format_version && config.target_page)
 				{
 				// store the conf in the local storage 
@@ -134,14 +150,36 @@ function readSingleFile(e)
 				// reload the configuration page with the new conf
 				document.location.href="config.html";
 				}
-			else alert("invalid file format");
+			else 
+				{
+				// try modify header add-on file format  : array of {action,name,value,comment,enabled}
+				if (config[0].action)
+					{
+					var headers = [];
+					for (var line_to_load of config)
+						{
+						var enabled = "off"; 
+						if (line_to_load.enabled) enabled = "on"
+						if (line_to_load.action=="Filter") line_to_load.action="delete";
+						headers.push({action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,status:enabled});
+						}
+					var to_load = {format_version:"1.0",target_page:"",headers:headers};
+					
+					// store the conf in the local storage 
+					localStorage.setItem("config",JSON.stringify(to_load));
+					// load the new conf 
+					browser.runtime.sendMessage("reload");
+					// reload the configuration page with the new conf
+					document.location.href="config.html";	
+					}
+				else  alert("invalid file format");
+				}
 			}
 		catch(error) 
 			{
   			console.log(error);
 			alert("Invalid file format");
 			}
-		alert(contents);
   		};
   	reader.readAsText(file);
 	}
