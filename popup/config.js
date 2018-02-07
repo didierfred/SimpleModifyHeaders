@@ -18,7 +18,7 @@ window.onload = function() {
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
 	document.getElementById('export_button').addEventListener('click',function (e) {export_data();});
 	document.getElementById('import_button').addEventListener('click',function (e) {import_data(e);});
-	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","off");});
+	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","off");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=config.target_page;
 	started = localStorage.getItem("started");
@@ -30,10 +30,10 @@ function appendLine(action,header_name,header_value,comment,status) {
 
 var html = "<td><select id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
 html = html + "<td><input id=\"header_name"+ line_number + "\"></input></td>";
-html = html + "<td><input id=\"header_value"+ line_number + "\"></input></td>";
-html = html + "<td><input id=\"comment"+ line_number + "\"></input></td>";
+html = html + "<td><input size=\"30\" id=\"header_value"+ line_number + "\"></input></td>";
+html = html + "<td><input size=\"30\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
-html = html + "<td><input type=\"button\" value=\"DELETE\" id=\"delete_button" + line_number + "\"></input> </td>";
+html = html + "<td><input class=\"button\" type=\"button\" value=\"Delete\" id=\"delete_button" + line_number + "\"></input> </td>";
 
 var newTR = document.createElement("tr");
 newTR.id="line" + line_number;
@@ -78,6 +78,7 @@ function save_data ()
 
 function export_data()
 	{
+	save_data();
 	// Create file data
 	var to_export= create_configuration_data();
 	
@@ -97,13 +98,16 @@ function export_data()
 function import_data(evt)
 	{
 	// create an input field in the iframe
-	var input = document.createElement("input");
-	input.type="file";
-	input.addEventListener('change', readSingleFile, false);
-	var myf = document.getElementById("download");
-	myf = myf.contentWindow.document || myf.contentDocument;
-	myf.body.appendChild(input);
-	input.click();
+	if (window.confirm("This will erase your actual configuration, do you want to continue ?"))
+		{
+		var input = document.createElement("input");
+		input.type="file";
+		input.addEventListener('change', readSingleFile, false);
+		var myf = document.getElementById("download");
+		myf = myf.contentWindow.document || myf.contentDocument;
+		myf.body.appendChild(input);
+		input.click();
+		}
 
 	}
 
@@ -123,7 +127,6 @@ function readSingleFile(e)
 			config = JSON.parse(contents);
 			if (config.format_version && config.target_page)
 				{
-				alert("ok");
 				// store the conf in the local storage 
 				localStorage.setItem("config",contents);
 				// load the new conf 

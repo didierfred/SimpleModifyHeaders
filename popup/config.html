@@ -3,21 +3,62 @@
 <html>
   <head>
     <meta charset="utf-8">
-   
+	<title> Simple Modify Headers</title>
+   <style type="text/css"> 
+.button {
+    background-color: #008CBA; /* Blue */
+    border: none;
+    color: white;
+    padding: 1px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+	border-radius: 4px;
+}
+.button:hover {
+    background-color: #0070A0; 
+}
+
+
+.colonne{
+background-color: #008CBA; /* Blue */
+color: white;
+}
+
+.title{
+color: #008CBA;
+}
+</style>
   </head>
 
 <body>
 
 <table>
 <tr>
-<td width="450">
-  <h2> SIMPLE MODIFY HEADERS   </h2> 
 
-  Url Pattern : <input id="targetPage"  type="text" value=""></input>
+<td width="680" align="left">
+<h2 class="title"> SIMPLE MODIFY HEADERS   </h2>
 </td>
 <td width="50">
 <br>
-<img id="start_img" src="img/start.png" align="right" valign="center"> </img> 
+<img id="start_img" src="img/start.png" align="left" valign="top"> </img> 
+<br>
+</td>
+</tr>
+</table>
+<br>
+<table>
+<tr>
+
+<td width="450">
+   
+  Url Pattern :  <input size="50" id="targetPage"  type="text" value=""></input> 
+</td>
+
+<td width="270" align="right">
+<input type="button" class="button" style="width:100px" id="export_button" value="Export"></input>&nbsp
+<input type="button" class="button" style="width:100px" id="import_button" value="Import"></input>
 </td>
 </tr>
 </table>
@@ -25,7 +66,7 @@
 	<br>
 	<br>
   <table id="config_tab" id="config"> 
-	<tr> 
+	<tr class="colonne"> 
 		<td> Action </td>		
 		<td> Header Field Name </td>
 		<td> Header Field Value </td>
@@ -35,10 +76,9 @@
   </table>
 <center>
 <br>
-<input type="button" id="add_button" value="ADD NEW LINE" ></input>
-<input type="button" id="save_button" value="SAVE"></input>
-<input type="button" id="export_button" value="EXPORT"></input>
-<input type="button" id="import_button" value="IMPORT"></input>
+<input type="button" class="button" style="width:100px" id="add_button" value="Add new line" ></input>
+<input type="button" class="button" style="width:100px" id="save_button" value="Save"></input>
+
 
 <iframe id="download" width="0" height="0" frameBorder="0"> 
 </iframe>
