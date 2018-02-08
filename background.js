@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.1
+ * @version 0.2
  */
 
 
@@ -149,7 +149,7 @@ function notify(message)
 function addListener()
 	{
 	var target = config.target_page;
-	if ((target=="*")||(target=="")||(target==" "))target="<all_urls>";
+	if ((target=="*")||(target=="")||(target==" ")) target="<all_urls>";
 	
 	browser.webRequest.onBeforeSendHeaders.addListener(rewriteHeader,
                                           {urls: [target]},

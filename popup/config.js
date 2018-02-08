@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.1
+ * @version 0.2
  */
 
 
@@ -21,6 +21,7 @@ window.onload = function() {
 	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","off");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=config.target_page;
+	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
 	started = localStorage.getItem("started");
 	if (started=="on") document.getElementById("start_img").src = "img/stop.png";	
 } ;
@@ -69,17 +70,24 @@ function create_configuration_data()
 	return JSON.stringify(to_export);
 }
 
+// check if url pattern is valid , if not ,  set the font color to red
+function checkTargetPageField()
+{
+if (isTargetValid(document.getElementById('targetPage').value)) document.getElementById('targetPage').style.color="black";
+else document.getElementById('targetPage').style.color="red";
+}
+
 // check if url pattern is valid
 function isTargetValid(target)
 	{
 		if (target=="") return true;
 		if (target==" ") return true;
 		if (target=="*") return true;
-		return target.match("(http|https):\/\/.[^\*]*\/");
+		return target.match("(http|https|[\*]):\/\/([\*][\.][^\*]*|[^\*]*|[\*])\/");
 	}
 
 
-function save_data () 
+function save_data() 
 	{
 	if (!isTargetValid(document.getElementById('targetPage').value))
 		{
@@ -143,6 +151,8 @@ function readSingleFile(e)
 			// check file format
 			if (config.format_version && config.target_page)
 				{
+				// if url pattern invalid , set to "" 
+				if (!isTargetValid(config.target_page)) config.target_page=""; 
 				// store the conf in the local storage 
 				localStorage.setItem("config",contents);
 				// load the new conf 
