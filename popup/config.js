@@ -30,9 +30,9 @@ window.onload = function() {
 function appendLine(action,header_name,header_value,comment,status) {
 
 var html = "<td><select id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
-html = html + "<td><input id=\"header_name"+ line_number + "\"></input></td>";
-html = html + "<td><input size=\"30\" id=\"header_value"+ line_number + "\"></input></td>";
-html = html + "<td><input size=\"30\" id=\"comment"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"input_field\" size=\"15\" id=\"header_name"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"input_field\" size=\"20\" id=\"header_value"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"input_field\" size=\"20\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
 html = html + "<td><input class=\"button\" type=\"button\" value=\"Delete\" id=\"delete_button" + line_number + "\"></input> </td>";
 

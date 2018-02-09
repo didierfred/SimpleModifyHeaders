@@ -41,6 +41,7 @@ function start_modify()
 
 function start_config()
 	{
-	var strWindowFeatures = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,width=800,height=600";
-	window.open("config.html","Simple Modify Headers",strWindowFeatures);
+	//var strWindowFeatures = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,width=800,height=600";
+	// window.open("config.html","Simple Modify Headers",strWindowFeatures);
+	browser.tabs.create({url:"config.html"});
 	}

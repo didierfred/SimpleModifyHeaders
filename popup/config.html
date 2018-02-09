@@ -9,7 +9,7 @@
     background-color: #008CBA; /* Blue */
     border: none;
     color: white;
-    padding: 1px 5px;
+    padding: 5px 5px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -20,6 +20,10 @@
     background-color: #0070A0; 
 }
 
+.input_field{
+	font-size: 14px;
+	padding: 1px 5px;
+}
 
 .colonne{
 background-color: #008CBA; /* Blue */
@@ -33,35 +37,29 @@ color: #008CBA;
   </head>
 
 <body>
-
 <table>
-<tr>
+<tr><td>
 
-<td width="680" align="left">
-<h2 class="title"> SIMPLE MODIFY HEADERS   </h2>
-</td>
-<td width="50">
-<br>
-<img id="start_img" src="img/start.png" align="left" valign="top"> </img> 
-<br>
-</td>
-</tr>
-</table>
-<br>
-<table>
-<tr>
 
-<td width="450">
+
+<h2 class="title"> SIMPLE MODIFY HEADERS   
+
+<img id="start_img" src="img/start.png" align="right" valign="top"> </img> 
+</h2>
+
+</td></tr>
+<tr><td>
+
+
    
-  Url Pattern* :  <input size="50" id="targetPage"  type="text" value="">
-</td>
+  Url Pattern* :  <input size="50" id="targetPage"  class="input_field" type="text" value="">
 
-<td width="270" align="right">
-<input type="button" class="button" style="width:100px" id="export_button" value="Export"></input>&nbsp
-<input type="button" class="button" style="width:100px" id="import_button" value="Import"></input>
-</td>
-</tr>
-</table>
+
+<input align="right" type="button" class="button" style="width:100px" id="export_button" value="Export"></input>&nbsp
+<input align="right" type="button" class="button" style="width:100px" id="import_button" value="Import"></input>
+
+</td></tr>
+<tr><td>
 
 	<br>
 	<br>
@@ -74,6 +72,9 @@ color: #008CBA;
 		<td> Status </td>
 	</tr>
   </table>
+
+</td></tr>
+<tr><td>
 <center>
 <br>
 <input type="button" class="button" style="width:100px" id="add_button" value="Add new line" ></input>
@@ -82,7 +83,8 @@ color: #008CBA;
 <br>
 </center>
 </i> * Informations on url pattern can be found <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank"> here  </a>  </i>
-
+</td></tr>
+</table>
 <iframe id="download" width="0" height="0" frameBorder="0"> 
 </iframe>
 
