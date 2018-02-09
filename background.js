@@ -10,8 +10,6 @@
 
 "use strict";
 
-//var targetPage = "https://httpbin.org/*";
-//var modifyTable = [];
 var config ;
 var started = "off";
 
@@ -23,7 +21,7 @@ if (localStorage.getItem('config'))
 	}
 else 
 	{
-	// else check if old config exist
+	// else check if old config exist (Simple Modify headers V1.1)
 	if (localStorage.getItem('targetPage')&& localStorage.getItem('modifyTable'))
 		{
 			console.log("Load old config");

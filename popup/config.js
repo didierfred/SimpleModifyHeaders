@@ -13,6 +13,7 @@ var line_number = 1;
 var started = "off";
 
 window.onload = function() {
+	// load configuration from local storage
 	var config = JSON.parse(localStorage.getItem("config"));	
 	for (var to_add of config.headers) appendLine(to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.status);
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
@@ -26,7 +27,9 @@ window.onload = function() {
 	if (started=="on") document.getElementById("start_img").src = "img/stop.png";	
 } ;
 
-
+/**
+* Add a new configuration line on the UI 
+**/
 function appendLine(action,header_name,header_value,comment,status) {
 
 var html = "<td><select class=\"select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
@@ -50,6 +53,11 @@ document.getElementById('delete_button'+line_number).addEventListener('click',fu
 line_number++;
 }
 
+
+/**
+* Create a JSON String representing the configuration data 
+*
+**/
 function create_configuration_data()
 {
 	var tr_elements = document.querySelectorAll("#config_tab tr");
@@ -63,21 +71,23 @@ function create_configuration_data()
 		var comment = tr_elements[i].childNodes[3].childNodes[0].value;
 		var status = tr_elements[i].childNodes[4].childNodes[0].value;
 		headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,status:status});
-
 		}
 	var to_export = {format_version:"1.0",target_page:document.getElementById('targetPage').value,headers:headers};
-	console.log(JSON.stringify(to_export));
 	return JSON.stringify(to_export);
 }
 
-// check if url pattern is valid , if not ,  set the font color to red
+/**
+*  check if url pattern is valid , if not ,  set the font color to red
+**/
 function checkTargetPageField()
 {
 if (isTargetValid(document.getElementById('targetPage').value)) document.getElementById('targetPage').style.color="black";
 else document.getElementById('targetPage').style.color="red";
 }
 
-// check if url pattern is valid
+/**
+* check if url pattern is valid
+**/
 function isTargetValid(target)
 	{
 		if (target=="") return true;
@@ -85,22 +95,32 @@ function isTargetValid(target)
 		if (target=="*") return true;
 		return target.match("(http|https|[\*]):\/\/([\*][\.][^\*]*|[^\*]*|[\*])\/");
 	}
-
+/**
+* If url pattern is valid save the data to the local storage and restart modify header
+**/
 
 function save_data() 
 	{
 	if (!isTargetValid(document.getElementById('targetPage').value))
 		{
-			alert("Url pattern  is invalid");
+			alert("Can not save : Url pattern  is invalid");
 			return;
 		}
 	localStorage.setItem("config",create_configuration_data());
 	browser.runtime.sendMessage("reload");
 	}
-
+/**
+* If url pattern is valid save the data in a file 
+**/
 
 function export_data()
 	{
+	if (!isTargetValid(document.getElementById('targetPage').value))
+		{
+			alert("Can not export : Url pattern  is invalid");
+			return;
+		}
+	// Save in local storage
 	save_data();
 	// Create file data
 	var to_export= create_configuration_data();
@@ -118,6 +138,11 @@ function export_data()
 	a.click();
 	}
 	
+
+/**
+* Choose a file and import data from the choosen file
+*
+**/
 function import_data(evt)
 	{
 	// create an input field in the iframe
@@ -133,6 +158,13 @@ function import_data(evt)
 		}
 
 	}
+
+/**
+* Import data from a file
+*
+* If format is not recognized , try modify header add-an file format
+*
+**/
 
 function readSingleFile(e) 
 	{
@@ -195,7 +227,9 @@ function readSingleFile(e)
 	}
 
 
-
+/**
+* Delete a configuration line on the UI 
+**/
 function delete_line(line_number_to_delete)
 	{
 	if (line_number_to_delete != line_number) 
@@ -215,7 +249,9 @@ function delete_line(line_number_to_delete)
 	line_number--;
 	}
 
-
+/**
+* Stop or Start modify header
+**/
 function start_modify()
 	{
 	if (started=="off") 
