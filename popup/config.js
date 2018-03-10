@@ -1,4 +1,4 @@
- 
+ 	
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,12 +14,14 @@ var started = "off";
 
 window.onload = function() {
 	// load configuration from local storage
-	var config = JSON.parse(localStorage.getItem("config"));	
-	for (var to_add of config.headers) appendLine(to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.status);
+	var config = JSON.parse(localStorage.getItem("config"));
+
+		
+	for (var to_add of config.headers) appendLine(to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
 	document.getElementById('export_button').addEventListener('click',function (e) {export_data();});
 	document.getElementById('import_button').addEventListener('click',function (e) {import_data(e);});
-	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","off");});
+	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","req","off");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=config.target_page;
 	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
@@ -30,12 +32,13 @@ window.onload = function() {
 /**
 * Add a new configuration line on the UI 
 **/
-function appendLine(action,header_name,header_value,comment,status) {
+function appendLine(action,header_name,header_value,comment,apply_on,status) {
 
 var html = "<td><select class=\"select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
 html = html + "<td><input class=\"input_field\" size=\"15\" id=\"header_name"+ line_number + "\"></input></td>";
 html = html + "<td><input class=\"input_field\" size=\"20\" id=\"header_value"+ line_number + "\"></input></td>";
 html = html + "<td><input class=\"input_field\" size=\"20\" id=\"comment"+ line_number + "\"></input></td>";
+html = html + "<td><select class=\"select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
 html = html + "<td><select class=\"select_field\" id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
 html = html + "<td><input class=\"button\" type=\"button\" value=\"Delete\" id=\"delete_button" + line_number + "\"></input> </td>";
 
@@ -45,6 +48,7 @@ newTR.innerHTML = html;
 document.getElementById("config_tab").appendChild(newTR);
 document.getElementById("select_action"+line_number).value = action;
 document.getElementById("select_status"+line_number).value = status;
+document.getElementById("apply_on"+line_number).value = apply_on;
 document.getElementById("header_name"+line_number).value = header_name;
 document.getElementById("header_value"+line_number).value = header_value;
 document.getElementById("comment"+line_number).value = comment;
@@ -69,10 +73,11 @@ function create_configuration_data()
 		var header_name = tr_elements[i].childNodes[1].childNodes[0].value;
 		var header_value = tr_elements[i].childNodes[2].childNodes[0].value;
 		var comment = tr_elements[i].childNodes[3].childNodes[0].value;
-		var status = tr_elements[i].childNodes[4].childNodes[0].value;
-		headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,status:status});
+		var apply_on = tr_elements[i].childNodes[4].childNodes[0].value;
+		var status = tr_elements[i].childNodes[5].childNodes[0].value;
+		headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
 		}
-	var to_export = {format_version:"1.0",target_page:document.getElementById('targetPage').value,headers:headers};
+	var to_export = {format_version:"1.1",target_page:document.getElementById('targetPage').value,headers:headers};
 	return JSON.stringify(to_export);
 }
 
@@ -175,7 +180,7 @@ function readSingleFile(e)
   	var reader = new FileReader();
   	reader.onload = function(e) 
 		{
-    	var contents = e.target.result;
+    		var contents = e.target.result;
 		var config="";	
 		try
 			{
@@ -185,8 +190,16 @@ function readSingleFile(e)
 				{
 				// if url pattern invalid , set to "" 
 				if (!isTargetValid(config.target_page)) config.target_page=""; 
+
+				// if format file is 1.0 , need to add the apply_on value 
+				if (config.format_version=="1.0") 
+					{
+					config.format_version="1.1";
+					for (var line of config.headers) line.apply_on="req";
+					}
+
 				// store the conf in the local storage 
-				localStorage.setItem("config",contents);
+				localStorage.setItem("config",JSON.stringify(config));
 				// load the new conf 
 				browser.runtime.sendMessage("reload");
 				// reload the configuration page with the new conf
@@ -203,9 +216,9 @@ function readSingleFile(e)
 						var enabled = "off"; 
 						if (line_to_load.enabled) enabled = "on"
 						if (line_to_load.action=="Filter") line_to_load.action="delete";
-						headers.push({action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,status:enabled});
+						headers.push({action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
 						}
-					var to_load = {format_version:"1.0",target_page:"",headers:headers};
+					var to_load = {format_version:"1.1",target_page:"",headers:headers};
 					
 					// store the conf in the local storage 
 					localStorage.setItem("config",JSON.stringify(to_load));
