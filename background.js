@@ -20,9 +20,9 @@ if (localStorage.getItem('config'))
 	config= JSON.parse(localStorage.getItem('config'));
 	
 	// If config 1.0 (Simple Modify headers V1.2) , save to format 1.1	
-	if (config.version=="1.0") 
+	if (config.format_version=="1.0") 
 		{
-		config.version="1.1";
+		config.format_version="1.1";
 		for (var line of config.headers) line.apply_on="req";
 		console.log("save new config"+JSON.stringify(config));
 		localStorage.setItem("config",JSON.stringify(config));
