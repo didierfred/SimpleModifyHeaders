@@ -38,7 +38,7 @@ var html = "<td><select class=\"select_field\" id=\"select_action" + line_number
 html = html + "<td><input class=\"input_field\" size=\"15\" id=\"header_name"+ line_number + "\"></input></td>";
 html = html + "<td><input class=\"input_field\" size=\"20\" id=\"header_value"+ line_number + "\"></input></td>";
 html = html + "<td><input class=\"input_field\" size=\"20\" id=\"comment"+ line_number + "\"></input></td>";
-html = html + "<td><select class=\"select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
+html = html + "<td><select class=\"select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> request </option><option value=\"res\">response</option></select></td>";
 html = html + "<td><select class=\"select_field\" id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
 html = html + "<td><input class=\"button\" type=\"button\" value=\"Delete\" id=\"delete_button" + line_number + "\"></input> </td>";
 
