@@ -120,7 +120,6 @@ function rewriteRequestHeader(e)
 */
 function rewriteResponseHeader(e) 
 {
-//console.log("modify response header");
   for (var to_modify of config.headers)
 	{
 		if ((to_modify.status=="on")&&(to_modify.apply_on=="res"))
@@ -154,7 +153,6 @@ function rewriteResponseHeader(e)
 
 	}
 
-// console.log("response=" +JSON.stringify(e.responseHeaders));
   return {responseHeaders: e.responseHeaders};
 }
 
@@ -212,9 +210,9 @@ function addListener()
                                           ["blocking", "responseHeaders"]);
 
 // for debug only
-	browser.webRequest.onCompleted.addListener(log_headers,
-                                          {urls: [target]},
-                                          ["responseHeaders"]);
+//	browser.webRequest.onCompleted.addListener(log_headers,
+//                                          {urls: [target]},
+//                                          ["responseHeaders"]);
 	}
 
 function log_headers(e)
@@ -233,7 +231,7 @@ function removeListener()
 	browser.webRequest.onBeforeSendHeaders.removeListener(rewriteRequestHeader);
 	browser.webRequest.onHeadersReceived.removeListener(rewriteResponseHeader);
 // for debug only
-	browser.webRequest.onCompleted.removeListener(log_headers);
+//	browser.webRequest.onCompleted.removeListener(log_headers);
 	}
 
 
