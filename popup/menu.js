@@ -41,7 +41,24 @@ function start_modify()
 
 function start_config()
 	{
-	//var strWindowFeatures = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,width=800,height=600";
-	// window.open("config.html","Simple Modify Headers",strWindowFeatures);
-	browser.tabs.create({url:"config.html"});
+	var promise_tabs =  browser.tabs.query({currentWindow: true});
+	promise_tabs.then(loadConfigTab);
+	}	
+	
+	
+function loadConfigTab(tabs)
+	{
+	var config_tab;
+	
+	// search for config tab 
+	for (let tab of tabs) 
+		{
+			if (tab.url.startsWith(browser.extension.getURL(""))) config_tab = tab;
+		}
+		
+	// config tab exits , put the focus on it 
+    if (config_tab) browser.tabs.update(config_tab.id,{active:true})
+
+	// else create a new tab
+	else browser.tabs.create({url:"config.html"});
 	}
