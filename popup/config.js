@@ -34,13 +34,15 @@ window.onload = function() {
 **/
 function appendLine(action,header_name,header_value,comment,apply_on,status) {
 
-var html = "<td><select class=\"select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">add</option><option value=\"modify\">modify</option><option value=\"delete\">delete</option></select></td>";
-html = html + "<td><input class=\"input_field\" size=\"15\" id=\"header_name"+ line_number + "\"></input></td>";
-html = html + "<td><input class=\"input_field\" size=\"20\" id=\"header_value"+ line_number + "\"></input></td>";
-html = html + "<td><input class=\"input_field\" size=\"20\" id=\"comment"+ line_number + "\"></input></td>";
-html = html + "<td><select class=\"select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> request </option><option value=\"res\">response</option></select></td>";
-html = html + "<td><select class=\"select_field\" id=\"select_status" + line_number + "\"><option value=\"on\"> on </option><option value=\"off\">off</option></select></td>";
-html = html + "<td><input class=\"button\" type=\"button\" value=\"Delete\" id=\"delete_button" + line_number + "\"></input> </td>";
+var html = "<td><select class=\"form_control\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
+html = html + "<td><input class=\"form_control\"  id=\"header_name"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"header_value"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"comment"+ line_number + "\"></input></td>";
+html = html + "<td><select class=\"form_control\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
+html = html + "<td><select class=\"form_control\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
+html = html +  "<td> <a href=\"#\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span> Effacer </a></td>"; 
+
+
 
 var newTR = document.createElement("tr");
 newTR.id="line" + line_number;
@@ -66,7 +68,7 @@ function create_configuration_data()
 {
 	var tr_elements = document.querySelectorAll("#config_tab tr");
 	var headers = [];
-	for (i=1;i<tr_elements.length;i++)  // ignore line 1 which is the table header
+	for (i=0;i<tr_elements.length;i++)
 		{
 	
 		var action = tr_elements[i].childNodes[0].childNodes[0].value;
