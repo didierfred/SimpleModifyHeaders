@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.1
+ * @version 0.2
  */
 
 

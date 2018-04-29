@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.2
+ * @version 0.3
  */
 
 
@@ -49,7 +49,7 @@ else
 		{
 				console.log("Load default config");
 				var headers = [];
-				headers.push({action:"add",header_name:"test_header_name",header_value:"test_header_value",comment:"test",apply_on:"req",status:"on"});
+				headers.push({action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
 				config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers};
 				// save configuration 
 				localStorage.setItem("config",JSON.stringify(config));

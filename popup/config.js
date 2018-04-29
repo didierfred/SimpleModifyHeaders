@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.2
+ * @version 0.3
  */
 
 
@@ -43,8 +43,6 @@ html = html + "<td><select class=\"form_control\" id=\"select_status" + line_num
 html = html +  "<td> <a href=\"#\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
 html = html +  "<td> <a href=\"#\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
 html = html +  "<td> <a href=\"#\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span> Delete </a></td>"; 
-
-console.log("html="+ html);
 
 var newTR = document.createElement("tr");
 newTR.id="line" + line_number;
@@ -265,24 +263,19 @@ function delete_line(line_number_to_delete)
 				}
 			}
 	var Node_to_delete = document.getElementById("line"+(line_number-1));
-    Node_to_delete.parentNode.removeChild(Node_to_delete);
+    	Node_to_delete.parentNode.removeChild(Node_to_delete);
 	line_number--;
 	}
 
 
 /**
-* Move up a configuration line on the UI 
+* Invert two configuration lines on the UI
 **/
-function move_line_up(line_number_to_move)
-	{
-	if (line_number_to_move != 1) invert_line(line_number_to_move-1,line_number)
-
-	}
 
 
 function invert_line(line1, line2)
 	{
-	// if line does not exist
+	// if a line does not exist , do nothing
 	if ((line1==0)||(line2==0)||(line1>=line_number)||(line2>=line_number)) return;
 
 	// Save data for line 1 
@@ -300,6 +293,7 @@ function invert_line(line1, line2)
 	document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
 	document.getElementById("select_status"+line1).value = document.getElementById("select_status"+line2).value;
 	document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
+
 	// Copy line 1 to line 2 
 	document.getElementById("select_action"+line2).value = select_action1;
 	document.getElementById("header_name"+line2).value = header_name1;
