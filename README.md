@@ -23,6 +23,8 @@ It's possible to:
 
 The extension can be start and stop via the button on the top right.
 
+The rules are active in private window mode but you can't use the configuration window in this mode.
+
 The code is opensource under Mozilla Public License 2.0 
 
 

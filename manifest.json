@@ -10,7 +10,7 @@
   },
 
   "permissions": [
-    "activeTab","storage","webRequest", "webRequestBlocking", "<all_urls>" 
+    "activeTab","storage","webRequest", "webRequestBlocking", "<all_urls>" ,"tabs"
   ],
   
   "background": {
