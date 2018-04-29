@@ -40,9 +40,11 @@ html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"header_value"
 html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select class=\"form_control\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
 html = html + "<td><select class=\"form_control\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
-html = html +  "<td> <a href=\"#\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span> Effacer </a></td>"; 
+html = html +  "<td> <a href=\"#\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
+html = html +  "<td> <a href=\"#\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
+html = html +  "<td> <a href=\"#\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span> Delete </a></td>"; 
 
-
+console.log("html="+ html);
 
 var newTR = document.createElement("tr");
 newTR.id="line" + line_number;
@@ -54,8 +56,10 @@ document.getElementById("apply_on"+line_number).value = apply_on;
 document.getElementById("header_name"+line_number).value = header_name;
 document.getElementById("header_value"+line_number).value = header_value;
 document.getElementById("comment"+line_number).value = comment;
-var line_number_to_delete = line_number;
-document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {delete_line(line_number_to_delete)});
+var line_number_to_modify = line_number;
+document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {delete_line(line_number_to_modify)});
+document.getElementById('up_button'+line_number).addEventListener('click',function (e) {invert_line(line_number_to_modify,line_number_to_modify-1)});
+document.getElementById('down_button'+line_number).addEventListener('click',function (e) {invert_line(line_number_to_modify,line_number_to_modify+1)});
 line_number++;
 }
 
@@ -257,11 +261,53 @@ function delete_line(line_number_to_delete)
 				document.getElementById("header_value"+i).value = document.getElementById("header_value"+j).value;
 				document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
 				document.getElementById("select_status"+i).value = document.getElementById("select_status"+j).value;
+				document.getElementById("apply_on"+i).value = document.getElementById("apply_on"+j).value;
 				}
 			}
 	var Node_to_delete = document.getElementById("line"+(line_number-1));
     Node_to_delete.parentNode.removeChild(Node_to_delete);
 	line_number--;
+	}
+
+
+/**
+* Move up a configuration line on the UI 
+**/
+function move_line_up(line_number_to_move)
+	{
+	if (line_number_to_move != 1) invert_line(line_number_to_move-1,line_number)
+
+	}
+
+
+function invert_line(line1, line2)
+	{
+	// if line does not exist
+	if ((line1==0)||(line2==0)||(line1>=line_number)||(line2>=line_number)) return;
+
+	// Save data for line 1 
+	var select_action1= document.getElementById("select_action"+line1).value;
+	var header_name1 = document.getElementById("header_name"+line1).value;
+	var header_value1= document.getElementById("header_value"+line1).value;
+	var comment1 = document.getElementById("comment"+line1).value;
+	var select_status1 = document.getElementById("select_status"+line1).value;
+	var apply_on1 = document.getElementById("apply_on"+line1).value;
+
+	// Copy line 2 to line 1
+	document.getElementById("select_action"+line1).value = document.getElementById("select_action"+line2).value;
+	document.getElementById("header_name"+line1).value = document.getElementById("header_name"+line2).value;
+	document.getElementById("header_value"+line1).value = document.getElementById("header_value"+line2).value;
+	document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
+	document.getElementById("select_status"+line1).value = document.getElementById("select_status"+line2).value;
+	document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
+	// Copy line 1 to line 2 
+	document.getElementById("select_action"+line2).value = select_action1;
+	document.getElementById("header_name"+line2).value = header_name1;
+	document.getElementById("header_value"+line2).value = header_value1;
+	document.getElementById("comment"+line2).value = comment1;
+	document.getElementById("select_status"+line2).value = select_status1;
+	document.getElementById("apply_on"+line2).value = apply_on1;
+
 	}
 
 /**
