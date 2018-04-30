@@ -36,13 +36,13 @@ function appendLine(action,header_name,header_value,comment,apply_on,status) {
 
 var html = "<td><select class=\"form_control\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
 html = html + "<td><input class=\"form_control\"  id=\"header_name"+ line_number + "\"></input></td>";
-html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"header_value"+ line_number + "\"></input></td>";
-html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"comment"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"form_control\"  size=\"28\" id=\"header_value"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"form_control\"  size=\"28\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select class=\"form_control\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
 html = html + "<td><select class=\"form_control\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
 html = html +  "<td> <a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
 html = html +  "<td> <a href=\"#\" title=\"Move line down\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
-html = html +  "<td> <a href=\"#\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span> Delete </a></td>"; 
+html = html +  "<td> <a href=\"#\" title=\"Delete line\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>"; 
 
 var newTR = document.createElement("tr");
 newTR.id="line" + line_number;
@@ -112,11 +112,12 @@ function save_data()
 	{
 	if (!isTargetValid(document.getElementById('targetPage').value))
 		{
-			alert("Can not save : Url pattern  is invalid");
-			return;
+			alert("Can not save configuration: Url pattern  is invalid");
+			return false;
 		}
 	localStorage.setItem("config",create_configuration_data());
 	browser.runtime.sendMessage("reload");
+	return true;
 	}
 /**
 * If url pattern is valid save the data in a file 
@@ -311,10 +312,13 @@ function start_modify()
 	{
 	if (started=="off") 
 		{
-		localStorage.setItem("started","on");
-		browser.runtime.sendMessage("on");
-		started = "on";
-		document.getElementById("start_img").src = "img/stop.png";		
+		if (save_data())
+			{
+			localStorage.setItem("started","on");
+			browser.runtime.sendMessage("on");
+			started = "on";
+			document.getElementById("start_img").src = "img/stop.png";		
+			}
 		}
 	else 
 		{
