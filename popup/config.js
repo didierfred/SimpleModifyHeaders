@@ -40,8 +40,8 @@ html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"header_value"
 html = html + "<td><input class=\"form_control\"  size=\"30\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select class=\"form_control\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
 html = html + "<td><select class=\"form_control\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
-html = html +  "<td> <a href=\"#\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
-html = html +  "<td> <a href=\"#\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
+html = html +  "<td> <a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
+html = html +  "<td> <a href=\"#\" title=\"Move line down\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
 html = html +  "<td> <a href=\"#\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span> Delete </a></td>"; 
 
 var newTR = document.createElement("tr");
