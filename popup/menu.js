@@ -37,7 +37,7 @@ function start_modify()
 		document.getElementById("start_stop").value = "Start";
 		}
 
-	// reload config tab , to get the start/stop information correct 
+	// if exists reload config tab , to get the start/stop information correct 
 	var promise_tabs =  browser.tabs.query({currentWindow: true});
 	promise_tabs.then(reloadConfigTab);
 		
@@ -54,7 +54,7 @@ function reloadConfigTab(tabs)
 			if (tab.url.startsWith(browser.extension.getURL(""))) config_tab = tab;
 		}
 		
-	// config tab exits , reload it 
+	// config tab exists , reload it 
     if (config_tab) browser.tabs.reload(config_tab.id);
 
 	
