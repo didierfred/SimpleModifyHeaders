@@ -22,6 +22,13 @@
 .input_field{
 	font-size: 14px;
 	height: 30px;
+	border: 1px solid #AAAAAA;
+	border-radius: 3px;
+}
+
+.input_url {
+    border: none;
+    border-bottom: 1px solid #AAAAAA;
 }
 </style>
   </head>
@@ -39,7 +46,7 @@
 <br/>
  <div class="row">
   <div class="col-sm-8">  
-  Url Pattern* :  <input size="50" id="targetPage"  class="form_control" type="text" value="">
+  <b> Url Pattern* : </b> <input size="50" id="targetPage"  class="form_control input_url" type="text" value="">
   </div>
   <div class="col-sm-4" align="right"> 
 	<a href="#" id="export_button" class="btn btn-primary btn-sm" style="width:100px">
