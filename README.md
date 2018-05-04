@@ -1,4 +1,4 @@
-# SimpleModifyHeaders V 1.3
+# SimpleModifyHeaders V 1.4
 
 Extension for firefox . 
 
