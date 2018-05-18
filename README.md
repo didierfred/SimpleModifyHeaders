@@ -1,6 +1,6 @@
 # SimpleModifyHeaders V 1.4
 
-Extension for firefox . 
+Extension for firefox and chrome. 
 
 The extension rewrite the headers based on a rules table. 
 
