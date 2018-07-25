@@ -200,8 +200,9 @@ function readSingleFile(e)
 		try
 			{
 			config = JSON.parse(contents);
+			
 			// check file format
-			if (config.format_version && config.target_page)
+			if (config.format_version)
 				{
 				// if url pattern invalid , set to "" 
 				if (!isTargetValid(config.target_page)) config.target_page=""; 
