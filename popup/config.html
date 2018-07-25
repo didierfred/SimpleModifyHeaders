@@ -46,7 +46,7 @@
 <br/>
  <div class="row">
   <div class="col-sm-8">  
-  <b> Url Pattern* : </b> <input size="50" id="targetPage"  class="form_control input_url" type="text" value="">
+  <b> Url Patterns* : </b> <input size="75" id="targetPage"  class="form_control input_url" type="text" value="">
   </div>
   <div class="col-sm-4" align="right"> 
 	<a href="#" id="export_button" class="btn btn-primary btn-sm" style="width:100px">
@@ -91,15 +91,23 @@
         </a> 
 
 
-<br>
+
 </center>
+
+
 
 <br>
 <div class="row">
 	<div class="col-sm-10">
-		<i style="font-size:12pt"> * Informations on url pattern can be found <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank"> here  </a> &nbsp (An empty string on the field will select all urls.) </i>
+	<input type="checkbox" id="debug_mode"> Debug mode </input>
+	<br/><br/>	
+		<i style="font-size:10pt"> * Informations on url pattern can be found <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank"> here.</a> <br> An empty string on the field will select all urls. It's possible to select mutliple url patterns using semicolon(;) separator </i>
+
+		
 	</div>
-	<div class="col-sm-2" align="right">
+	<div class="col-sm-2" align="right" >
+		<br/>
+		<br/>
 		<a href="https://github.com/didierfred/SimpleModifyHeaders/tree/V1.4" target="_blank"> <span class="glyphicon glyphicon-question-sign"></span> About </a>
 	</div>
 </div>

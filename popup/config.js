@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.3
+ * @version 0.4
  */
 
 
@@ -21,12 +21,15 @@ window.onload = function() {
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
 	document.getElementById('export_button').addEventListener('click',function (e) {export_data();});
 	document.getElementById('import_button').addEventListener('click',function (e) {import_data(e);});
-	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","req","off");});
+	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","req","on");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=config.target_page;
 	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
+	
 	started = localStorage.getItem("started");
 	if (started=="on") document.getElementById("start_img").src = "img/stop.png";	
+	
+	if (config.debug_mode) document.getElementById("debug_mode").checked = true;	
 } ;
 
 /**
@@ -70,6 +73,7 @@ function create_configuration_data()
 {
 	var tr_elements = document.querySelectorAll("#config_tab tr");
 	var headers = [];
+	var debug_mode=false;
 	for (i=0;i<tr_elements.length;i++)
 		{
 	
@@ -81,7 +85,8 @@ function create_configuration_data()
 		var status = tr_elements[i].childNodes[5].childNodes[0].value;
 		headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
 		}
-	var to_export = {format_version:"1.1",target_page:document.getElementById('targetPage').value,headers:headers};
+	if (document.getElementById("debug_mode").checked) debug_mode=true ;	
+	var to_export = {format_version:"1.1",target_page:document.getElementById('targetPage').value,headers:headers,debug_mode:debug_mode};
 	return JSON.stringify(to_export);
 }
 
@@ -95,24 +100,29 @@ else document.getElementById('targetPage').style.color="red";
 }
 
 /**
-* check if url pattern is valid
+* check if url patterns are valid
 **/
 function isTargetValid(target)
 	{
 		if (target=="") return true;
 		if (target==" ") return true;
 		if (target=="*") return true;
-		return target.match("(http|https|[\*]):\/\/([\*][\.][^\*]*|[^\*]*|[\*])\/");
+		targets=target.split(";");
+		for (i in targets)
+			{
+				if (!targets[i].match("(http|https|[\*]):\/\/([\*][\.][^\*]*|[^\*]*|[\*])\/")) return false;
+			}
+		return true;
 	}
 /**
-* If url pattern is valid save the data to the local storage and restart modify header
+* If url patterns are valid save the data to the local storage and restart modify header
 **/
 
 function save_data() 
 	{
 	if (!isTargetValid(document.getElementById('targetPage').value))
 		{
-			alert("Can not save configuration: Url pattern  is invalid");
+			alert("Can not save configuration: Url patterns are invalid");
 			return false;
 		}
 	localStorage.setItem("config",create_configuration_data());
@@ -201,6 +211,7 @@ function readSingleFile(e)
 					{
 					config.format_version="1.1";
 					for (var line of config.headers) line.apply_on="req";
+					config.debug_mode=false;
 					}
 
 				// store the conf in the local storage 
@@ -223,7 +234,7 @@ function readSingleFile(e)
 						if (line_to_load.action=="Filter") line_to_load.action="delete";
 						headers.push({action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
 						}
-					var to_load = {format_version:"1.1",target_page:"",headers:headers};
+					var to_load = {format_version:"1.1",target_page:"",headers:headers,debug_mode:false};
 					
 					// store the conf in the local storage 
 					localStorage.setItem("config",JSON.stringify(to_load));
@@ -264,7 +275,7 @@ function delete_line(line_number_to_delete)
 				}
 			}
 	var Node_to_delete = document.getElementById("line"+(line_number-1));
-    	Node_to_delete.parentNode.removeChild(Node_to_delete);
+    Node_to_delete.parentNode.removeChild(Node_to_delete);
 	line_number--;
 	}
 
