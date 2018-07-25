@@ -23,10 +23,11 @@ It's possible to:
 -  export the configuration in a file (json format)
 -  import the configuration from a file , it support the format of  the Modifyheaders plugin 
 
-
 The extension can be start and stop via the button on the top right.
 
 The rules are active in private window mode but you can't use the configuration window in this mode.
+
+If you choose debug mode, detail log messages are available in the debugging console of the browser.
 
 The code is opensource under Mozilla Public License 2.0 
 
