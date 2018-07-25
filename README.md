@@ -12,7 +12,10 @@ The rules table contains lines with the following parameters :
 - apply on : "request" if the modification apply on the request headers or "response" if the modification apply on the response headers
 - status : on if the modification is active , off otherwise 
 
-We can choose the urls on which the modifications applies by modifying the url pattern. The url pattern must follow the syntaxe define by https://developer.chrome.com/extensions/match_patterns . Putting an empty string on the field will select all urls. It's possible to select mutliple url patterns using semicolon(;) separator
+We can choose the urls on which the modifications applies by modifying the url pattern :  
+- The url pattern must follow the syntaxe define by https://developer.chrome.com/extensions/match_patterns
+- Putting an empty string on the field will select all urls
+- It's possible to select mutliple url patterns using semicolon(;) separator
 
 To save and apply the modification , you need to click on the save button
 
