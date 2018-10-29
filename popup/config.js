@@ -42,28 +42,63 @@ html = html + "<td><input class=\"form_control input_field\"  id=\"header_name"+
 html = html + "<td><input class=\"form_control input_field\"  size=\"28\" id=\"header_value"+ line_number + "\"></input></td>";
 html = html + "<td><input class=\"form_control input_field\"  size=\"28\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select class=\"form_control select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
-html = html + "<td><select class=\"form_control select_field\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
-html = html +  "<td> <a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
-html = html +  "<td> <a href=\"#\" title=\"Move line down\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
-html = html +  "<td> <a href=\"#\" title=\"Delete line\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>"; 
+//html = html + "<td><select class=\"form_control select_field\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
+html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button" + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
+html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
+html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
+html = html +  "<td><a href=\"#\" title=\"Delete line\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>"; 
 
 var newTR = document.createElement("tr");
 newTR.id="line" + line_number;
 newTR.innerHTML = html;
 document.getElementById("config_tab").appendChild(newTR);
 document.getElementById("select_action"+line_number).value = action;
-document.getElementById("select_status"+line_number).value = status;
+//document.getElementById("select_status"+line_number).value = status;
 document.getElementById("apply_on"+line_number).value = apply_on;
 document.getElementById("header_name"+line_number).value = header_name;
 document.getElementById("header_value"+line_number).value = header_value;
 document.getElementById("comment"+line_number).value = comment;
 var line_number_to_modify = line_number;
+document.getElementById('activate_button'+line_number).addEventListener('click',function (e) {switch_activate_button(line_number_to_modify)});
+setButtonStatus(document.getElementById('activate_button'+line_number),status);
 document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {delete_line(line_number_to_modify)});
 document.getElementById('up_button'+line_number).addEventListener('click',function (e) {invert_line(line_number_to_modify,line_number_to_modify-1)});
 document.getElementById('down_button'+line_number).addEventListener('click',function (e) {invert_line(line_number_to_modify,line_number_to_modify+1)});
 line_number++;
 }
 
+function setButtonStatus(button,status)
+{
+if (status=="on")
+	{
+	button.className="btn btn-primary btn-sm";
+	button.innerHTML="ON  <span class=\"glyphicon glyphicon-ok\"></span>";
+	}
+else
+	{
+	button.className="btn btn-default btn-sm";
+	button.innerHTML="OFF <span class=\"glyphicon glyphicon-ban-circle\"></span>";
+	}
+}
+
+function getButtonStatus(button)
+{
+if (button.className=="btn btn-primary btn-sm") return "on";
+return "off";
+}
+
+
+function switch_activate_button(button_number)
+{
+var activate_button = document.getElementById("activate_button"+button_number);
+
+// Button is ON 
+if (getButtonStatus(activate_button)=="on") setButtonStatus(activate_button,"off");
+
+// Button is OFF
+else setButtonStatus(activate_button,"on");
+
+}
 
 /**
 * Create a JSON String representing the configuration data 
@@ -82,7 +117,7 @@ function create_configuration_data()
 		var header_value = tr_elements[i].childNodes[2].childNodes[0].value;
 		var comment = tr_elements[i].childNodes[3].childNodes[0].value;
 		var apply_on = tr_elements[i].childNodes[4].childNodes[0].value;
-		var status = tr_elements[i].childNodes[5].childNodes[0].value;
+		var status = getButtonStatus(tr_elements[i].childNodes[5].childNodes[0]);
 		headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
 		}
 	if (document.getElementById("debug_mode").checked) debug_mode=true ;	
@@ -271,12 +306,14 @@ function delete_line(line_number_to_delete)
 				document.getElementById("header_name"+i).value = document.getElementById("header_name"+j).value;
 				document.getElementById("header_value"+i).value = document.getElementById("header_value"+j).value;
 				document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
-				document.getElementById("select_status"+i).value = document.getElementById("select_status"+j).value;
+				//document.getElementById("select_status"+i).value = document.getElementById("select_status"+j).value;
+				setButtonStatus(document.getElementById("activate_button"+i),getButtonStatus(document.getElementById("activate_button"+j)));
 				document.getElementById("apply_on"+i).value = document.getElementById("apply_on"+j).value;
+						
 				}
 			}
 	var Node_to_delete = document.getElementById("line"+(line_number-1));
-    Node_to_delete.parentNode.removeChild(Node_to_delete);
+    	Node_to_delete.parentNode.removeChild(Node_to_delete);
 	line_number--;
 	}
 
@@ -296,7 +333,7 @@ function invert_line(line1, line2)
 	var header_name1 = document.getElementById("header_name"+line1).value;
 	var header_value1= document.getElementById("header_value"+line1).value;
 	var comment1 = document.getElementById("comment"+line1).value;
-	var select_status1 = document.getElementById("select_status"+line1).value;
+	var select_status1 = getButtonStatus(document.getElementById("activate_button"+line1));
 	var apply_on1 = document.getElementById("apply_on"+line1).value;
 
 	// Copy line 2 to line 1
@@ -304,7 +341,7 @@ function invert_line(line1, line2)
 	document.getElementById("header_name"+line1).value = document.getElementById("header_name"+line2).value;
 	document.getElementById("header_value"+line1).value = document.getElementById("header_value"+line2).value;
 	document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
-	document.getElementById("select_status"+line1).value = document.getElementById("select_status"+line2).value;
+	setButtonStatus(document.getElementById("activate_button"+line1),getButtonStatus(document.getElementById("activate_button"+line2)));
 	document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
 
 	// Copy line 1 to line 2 
@@ -312,7 +349,7 @@ function invert_line(line1, line2)
 	document.getElementById("header_name"+line2).value = header_name1;
 	document.getElementById("header_value"+line2).value = header_value1;
 	document.getElementById("comment"+line2).value = comment1;
-	document.getElementById("select_status"+line2).value = select_status1;
+	setButtonStatus(document.getElementById("activate_button"+line2),select_status1);
 	document.getElementById("apply_on"+line2).value = apply_on1;
 
 	}
