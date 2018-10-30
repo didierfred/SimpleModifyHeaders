@@ -5,32 +5,73 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * @author didierfred@gmail.com
- * @version 0.4
+ * @version 0.5
  */
 
 
 var line_number = 1;
 var started = "off";
+var show_comments = true;
+var header_name_field_size= 20;
+var header_value_field_size= 28;
+var comments_field_size= 28;
 
 window.onload = function() {
 	// load configuration from local storage
 	var config = JSON.parse(localStorage.getItem("config"));
 
+
+	if (config.debug_mode) document.getElementById("debug_mode").checked = true;
+
+	if (typeof config.show_comments == 'undefined') document.getElementById("show_comments").checked = true;	
+	else if (config.show_comments) document.getElementById("show_comments").checked = true;	
+	else show_comments=false;
 		
 	for (var to_add of config.headers) appendLine(to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
 	document.getElementById('save_button').addEventListener('click',function (e) {save_data();});
 	document.getElementById('export_button').addEventListener('click',function (e) {export_data();});
 	document.getElementById('import_button').addEventListener('click',function (e) {import_data(e);});
+	document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
 	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","req","on");});
 	document.getElementById('start_img').addEventListener('click',function (e) {start_modify();});
 	document.getElementById('targetPage').value=config.target_page;
 	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
+	document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
 	
 	started = localStorage.getItem("started");
 	if (started=="on") document.getElementById("start_img").src = "img/stop.png";	
 	
-	if (config.debug_mode) document.getElementById("debug_mode").checked = true;	
+
+	document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
+	reshapeTable();	
 } ;
+
+
+/** PARAMETERS SCREEN MANAGEMENT **/
+
+function showParametersScreen()
+{
+document.getElementById('main_screen').hidden=true;
+document.getElementById('parameters_screen').hidden=false;
+}
+
+
+function hideParametersScreen()
+{
+document.getElementById('main_screen').hidden=false;
+document.getElementById('parameters_screen').hidden=true;
+}
+
+function showCommentsClick()
+{
+if (document.getElementById('show_comments').checked) show_comments = true;
+else show_comments = false;
+reshapeTable();
+}
+
+/** END PARAMETERS SCREEN MANAGEMENT **/
+
+
 
 /**
 * Add a new configuration line on the UI 
@@ -38,11 +79,12 @@ window.onload = function() {
 function appendLine(action,header_name,header_value,comment,apply_on,status) {
 
 var html = "<td><select class=\"form_control select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
-html = html + "<td><input class=\"form_control input_field\"  id=\"header_name"+ line_number + "\"></input></td>";
-html = html + "<td><input class=\"form_control input_field\"  size=\"28\" id=\"header_value"+ line_number + "\"></input></td>";
-html = html + "<td><input class=\"form_control input_field\"  size=\"28\" id=\"comment"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"form_control input_field\"  size=\"" + header_name_field_size + "\" id=\"header_name"+ line_number + "\"></input></td>";
+html = html + "<td><input class=\"form_control input_field\"  size=\"" + header_value_field_size + "\" id=\"header_value"+ line_number + "\"></input></td>";
+html = html + "<td";
+if (!show_comments) html=html+" hidden";
+html = html + "><input class=\"form_control input_field\"  size=\""+ comments_field_size+ "\" id=\"comment"+ line_number + "\"></input></td>";
 html = html + "<td><select class=\"form_control select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
-//html = html + "<td><select class=\"form_control select_field\" id=\"select_status" + line_number + "\"><option value=\"on\"> ON </option><option value=\"off\">OFF</option></select></td>";
 html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button" + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
 html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
 html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
@@ -53,19 +95,22 @@ newTR.id="line" + line_number;
 newTR.innerHTML = html;
 document.getElementById("config_tab").appendChild(newTR);
 document.getElementById("select_action"+line_number).value = action;
-//document.getElementById("select_status"+line_number).value = status;
 document.getElementById("apply_on"+line_number).value = apply_on;
 document.getElementById("header_name"+line_number).value = header_name;
 document.getElementById("header_value"+line_number).value = header_value;
 document.getElementById("comment"+line_number).value = comment;
+
 var line_number_to_modify = line_number;
-document.getElementById('activate_button'+line_number).addEventListener('click',function (e) {switch_activate_button(line_number_to_modify)});
+document.getElementById('activate_button'+line_number).addEventListener('click',function (e) {switchActivateButton(line_number_to_modify)});
 setButtonStatus(document.getElementById('activate_button'+line_number),status);
 document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {delete_line(line_number_to_modify)});
 document.getElementById('up_button'+line_number).addEventListener('click',function (e) {invert_line(line_number_to_modify,line_number_to_modify-1)});
 document.getElementById('down_button'+line_number).addEventListener('click',function (e) {invert_line(line_number_to_modify,line_number_to_modify+1)});
 line_number++;
 }
+
+
+/** ACTIVATE BUTTON MANAGEMENT **/ 
 
 function setButtonStatus(button,status)
 {
@@ -88,7 +133,7 @@ return "off";
 }
 
 
-function switch_activate_button(button_number)
+function switchActivateButton(button_number)
 {
 var activate_button = document.getElementById("activate_button"+button_number);
 
@@ -100,6 +145,39 @@ else setButtonStatus(activate_button,"on");
 
 }
 
+/** END ACTIVATE BUTTON MANAGEMENT **/ 
+
+
+/** Resahpe the table  **/
+
+function reshapeTable()
+{
+var th_elements = document.querySelectorAll("#config_table_head th");
+var tr_elements = document.querySelectorAll("#config_tab tr");
+if (show_comments) 
+	{
+	header_name_field_size= 20;
+	header_value_field_size= 28;
+	}
+else 
+	{
+	header_name_field_size= 34;
+	header_value_field_size= 42;
+	}
+
+for (i=0;i<tr_elements.length;i++)
+	{
+	tr_elements[i].childNodes[3].hidden = (!show_comments);
+	tr_elements[i].childNodes[2].childNodes[0].size=header_value_field_size;
+	tr_elements[i].childNodes[1].childNodes[0].size=header_name_field_size;
+	}
+
+th_elements[3].hidden = (!show_comments);
+
+}
+
+
+
 /**
 * Create a JSON String representing the configuration data 
 *
@@ -109,6 +187,7 @@ function create_configuration_data()
 	var tr_elements = document.querySelectorAll("#config_tab tr");
 	var headers = [];
 	var debug_mode=false;
+	var show_comments=false;
 	for (i=0;i<tr_elements.length;i++)
 		{
 	
@@ -120,8 +199,9 @@ function create_configuration_data()
 		var status = getButtonStatus(tr_elements[i].childNodes[5].childNodes[0]);
 		headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
 		}
-	if (document.getElementById("debug_mode").checked) debug_mode=true ;	
-	var to_export = {format_version:"1.1",target_page:document.getElementById('targetPage').value,headers:headers,debug_mode:debug_mode};
+	if (document.getElementById("debug_mode").checked) debug_mode=true ;
+	if (document.getElementById("show_comments").checked) show_comments=true ;	
+	var to_export = {format_version:"1.1",target_page:document.getElementById('targetPage').value,headers:headers,debug_mode:debug_mode,show_comments:show_comments};
 	return JSON.stringify(to_export);
 }
 
@@ -306,7 +386,6 @@ function delete_line(line_number_to_delete)
 				document.getElementById("header_name"+i).value = document.getElementById("header_name"+j).value;
 				document.getElementById("header_value"+i).value = document.getElementById("header_value"+j).value;
 				document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
-				//document.getElementById("select_status"+i).value = document.getElementById("select_status"+j).value;
 				setButtonStatus(document.getElementById("activate_button"+i),getButtonStatus(document.getElementById("activate_button"+j)));
 				document.getElementById("apply_on"+i).value = document.getElementById("apply_on"+j).value;
 						
