@@ -12,6 +12,8 @@
 let line_number = 1;
 let started = "off";
 let show_comments = true;
+let use_url_contains = false;
+let url_contains_field_size= 18;
 let header_name_field_size= 20;
 let header_value_field_size= 28;
 let comments_field_size= 28;
@@ -24,13 +26,18 @@ window.onload = function() {
 	if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;	
 	else if (config.show_comments) document.getElementById("show_comments").checked = true;	
 	else show_comments=false;
+
+	if (config.use_url_contains) {
+          document.getElementById("use_url_contains").checked = true;
+          use_url_contains=true;
+        }
 		
-	for (let to_add of config.headers) appendLine(to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
+	for (let to_add of config.headers) appendLine(to_add.url_contains,to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
 	document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
 	document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
 	document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
 	document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
-	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("add","-","-","","req","on");});
+	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("","add","-","-","","req","on");});
 	document.getElementById('start_img').addEventListener('click',function (e) {startModify();});
 	document.getElementById('targetPage').value=config.target_page;
 	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
@@ -40,6 +47,7 @@ window.onload = function() {
 	if (started==="on") document.getElementById("start_img").src = "img/stop.png";	
 	
 	document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
+	document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
 	reshapeTable();	
 } 
 
@@ -62,6 +70,12 @@ function showCommentsClick() {
   reshapeTable();
 }
 
+function useUrlContainsClick() {
+  if (document.getElementById('use_url_contains').checked) use_url_contains = true;
+  else use_url_contains = false;
+  reshapeTable();
+}
+
 /** END PARAMETERS SCREEN MANAGEMENT **/
 
 
@@ -69,8 +83,11 @@ function showCommentsClick() {
 /**
 * Add a new configuration line on the UI 
 **/
-function appendLine(action,header_name,header_value,comment,apply_on,status) {
-  let html = "<td><select class=\"form_control select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
+function appendLine(url_contains,action,header_name,header_value,comment,apply_on,status) {
+  let html = "<td";
+  if (!use_url_contains) html=html+" hidden";
+  html = html + "><input class=\"form_control input_field\"  size=\""+ url_contains_field_size+ "\" id=\"url_contains"+ line_number + "\"></input></td>";
+  html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
   html = html + "<td><input class=\"form_control input_field\"  size=\"" + header_name_field_size + "\" id=\"header_name"+ line_number + "\"></input></td>";
   html = html + "<td><input class=\"form_control input_field\"  size=\"" + header_value_field_size + "\" id=\"header_value"+ line_number + "\"></input></td>";
   html = html + "<td";
@@ -88,6 +105,7 @@ function appendLine(action,header_name,header_value,comment,apply_on,status) {
   document.getElementById("config_tab").appendChild(newTR);
   document.getElementById("select_action"+line_number).value = action;
   document.getElementById("apply_on"+line_number).value = apply_on;
+  document.getElementById("url_contains"+line_number).value = url_contains;
   document.getElementById("header_name"+line_number).value = header_name;
   document.getElementById("header_value"+line_number).value = header_value;
   document.getElementById("comment"+line_number).value = comment;
@@ -138,19 +156,39 @@ function reshapeTable() {
   let th_elements = document.querySelectorAll("#config_table_head th");
   let tr_elements = document.querySelectorAll("#config_tab tr");
   if (show_comments) {
-    header_name_field_size= 20;
-    header_value_field_size= 28;
+    if (use_url_contains) {
+	url_contains_field_size= 18
+    	header_name_field_size= 18;
+    	header_value_field_size= 20;
+        comments_field_size= 20;
+    }
+    else {
+      header_name_field_size= 20;
+      header_value_field_size= 28;
+      comments_field_size= 28;
+    }
   }
   else {
-    header_name_field_size= 34;
-    header_value_field_size= 42;
+    if (use_url_contains) {
+	url_contains_field_size= 28
+    	header_name_field_size= 20;
+    	header_value_field_size= 28;
+    }
+    else {
+      header_name_field_size= 34;
+      header_value_field_size= 42;
+    }
   }
-  for (i=0;i<tr_elements.length;i++) {
-    tr_elements[i].childNodes[3].hidden = (!show_comments);
-    tr_elements[i].childNodes[2].childNodes[0].size=header_value_field_size;
-    tr_elements[i].childNodes[1].childNodes[0].size=header_name_field_size; 
+  for (i=0;i<tr_elements.length;i++) { 
+    tr_elements[i].childNodes[4].childNodes[0].size=comments_field_size; 
+    tr_elements[i].childNodes[4].hidden = (!show_comments);
+    tr_elements[i].childNodes[3].childNodes[0].size=header_value_field_size;
+    tr_elements[i].childNodes[2].childNodes[0].size=header_name_field_size; 
+    tr_elements[i].childNodes[0].childNodes[0].size=url_contains_field_size; 
+    tr_elements[i].childNodes[0].hidden = (!use_url_contains);
   }
-  th_elements[3].hidden = (!show_comments);
+  th_elements[4].hidden = (!show_comments);
+  th_elements[0].hidden = (!use_url_contains);	
 }
 
 
@@ -165,17 +203,19 @@ function create_configuration_data() {
   let debug_mode=false;
   let show_comments=false;
   for (i=0;i<tr_elements.length;i++) {
-    const action = tr_elements[i].childNodes[0].childNodes[0].value;
-    const header_name = tr_elements[i].childNodes[1].childNodes[0].value;
-    const header_value = tr_elements[i].childNodes[2].childNodes[0].value;
-    const comment = tr_elements[i].childNodes[3].childNodes[0].value;
-    const apply_on = tr_elements[i].childNodes[4].childNodes[0].value;
-    const status = getButtonStatus(tr_elements[i].childNodes[5].childNodes[0]);
-    headers.push({action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
+    const url_contains = tr_elements[i].childNodes[0].childNodes[0].value;
+    const action = tr_elements[i].childNodes[1].childNodes[0].value;
+    const header_name = tr_elements[i].childNodes[2].childNodes[0].value;
+    const header_value = tr_elements[i].childNodes[3].childNodes[0].value;
+    const comment = tr_elements[i].childNodes[4].childNodes[0].value;
+    const apply_on = tr_elements[i].childNodes[5].childNodes[0].value;
+    const status = getButtonStatus(tr_elements[i].childNodes[6].childNodes[0]);
+    headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
   }
   if (document.getElementById("debug_mode").checked) debug_mode=true ;
   if (document.getElementById("show_comments").checked) show_comments=true ;	
-  let to_export = {format_version:"1.1",target_page:document.getElementById('targetPage').value,headers:headers,debug_mode:debug_mode,show_comments:show_comments};
+  if (document.getElementById("use_url_contains").checked) use_url_contains=true ;
+  let to_export = {format_version:"1.2",target_page:document.getElementById('targetPage').value,headers:headers,debug_mode:debug_mode,show_comments:show_comments,use_url_contains:use_url_contains};
   return JSON.stringify(to_export);
 }
 
@@ -282,12 +322,27 @@ function readSingleFile(e) {
       if (config.format_version) {
         // if url pattern invalid , set to "" 
         if (!isTargetValid(config.target_page)) config.target_page=""; 
-        // if format file is 1.0 , need to add the apply_on value 
+
+        // if format file is 1.0 , need to add the apply_on and url_contains value  to translate in format 1.2 
         if (config.format_version==="1.0") {
-          config.format_version="1.1";
-          for (let line of config.headers) line.apply_on="req";
+          config.format_version="1.2";
+          for (let line of config.headers) {
+            line.apply_on="req";
+            line.url_contains="";
+          }
           config.debug_mode=false;
+	  config.show_comments=true;
+	  config.use_url_contains=false;
         }
+
+	// if format file is 1.1 , need to add url_contains value to translate in format 1.2 
+        if (config.format_version==="1.1") {
+          config.format_version="1.2";
+          for (let line of config.headers) line.url_contains="";
+	  config.show_comments=true;
+	  config.use_url_contains=false;
+        }
+
         // store the conf in the local storage 
         localStorage.setItem("config",JSON.stringify(config));
         // load the new conf 
@@ -302,9 +357,9 @@ function readSingleFile(e) {
 	  for (let line_to_load of config) {
             var enabled = "off"; 
             if (line_to_load.enabled) enabled = "on";
-	    if (line_to_load.action==="Filter") line_to_load.action="delete";			   headers.push({action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
+	    if (line_to_load.action==="Filter") line_to_load.action="delete";			   headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
 	  }
-	  let to_load = {format_version:"1.1",target_page:"",headers:headers,debug_mode:false};
+	  let to_load = {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
           // store the conf in the local storage 
           localStorage.setItem("config",JSON.stringify(to_load));
           // load the new conf 
@@ -332,6 +387,7 @@ function deleteLine(line_number_to_delete) {
     for (i=line_number_to_delete;i<line_number-1;i++) {
       const j = i+1;
       document.getElementById("select_action"+i).value = document.getElementById("select_action"+j).value;
+      document.getElementById("url_contains"+i).value = document.getElementById("url_contains"+j).value;
       document.getElementById("header_name"+i).value = document.getElementById("header_name"+j).value;
       document.getElementById("header_value"+i).value = document.getElementById("header_value"+j).value;
       document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
@@ -357,6 +413,7 @@ function invertLine(line1, line2) {
 
   // Save data for line 1 
   const select_action1= document.getElementById("select_action"+line1).value;
+  const url_contains1 = document.getElementById("url_contains"+line1).value;
   const header_name1 = document.getElementById("header_name"+line1).value;
   const header_value1= document.getElementById("header_value"+line1).value;
   const comment1 = document.getElementById("comment"+line1).value;
@@ -365,6 +422,7 @@ function invertLine(line1, line2) {
 
   // Copy line 2 to line 1
   document.getElementById("select_action"+line1).value = document.getElementById("select_action"+line2).value;
+  document.getElementById("url_contains"+line1).value = document.getElementById("url_contains"+line2).value;
   document.getElementById("header_name"+line1).value = document.getElementById("header_name"+line2).value;
   document.getElementById("header_value"+line1).value = document.getElementById("header_value"+line2).value;
   document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
@@ -373,6 +431,7 @@ function invertLine(line1, line2) {
 
   // Copy line 1 to line 2 
   document.getElementById("select_action"+line2).value = select_action1;
+  document.getElementById("url_contains"+line2).value = url_contains1;
   document.getElementById("header_name"+line2).value = header_name1;
   document.getElementById("header_value"+line2).value = header_value1;
   document.getElementById("comment"+line2).value = comment1;

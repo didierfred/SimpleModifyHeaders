@@ -27,6 +27,15 @@ if (localStorage.getItem('config')) {
     console.log("save new config"+JSON.stringify(config));
     localStorage.setItem("config",JSON.stringify(config));
   }
+
+ // If config 1.1 (Simple Modify headers V1.3 to version 1.5) , save to format 1.2	
+  if (config.format_version==="1.1") {
+    config.format_version="1.2";
+    for (let line of config.headers) line.url_contains="";
+    config.use_url_contains=false;
+    console.log("save new config"+JSON.stringify(config));
+    localStorage.setItem("config",JSON.stringify(config));
+  }
 }
 else {
   // else check if old config exist (Simple Modify headers V1.1)
@@ -35,7 +44,7 @@ else {
     let headers = [];
     let modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
     for (const to_modify of modifyTable) {
-      headers.push({action:to_modify[0],header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
+      headers.push({action:to_modify[0],url_contains:"",header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
     }
     config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false};
     // save old config in new format 
