@@ -33,13 +33,14 @@ window.onload = function() {
         }
 		
 	for (let to_add of config.headers) appendLine(to_add.url_contains,to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
-	document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
+	document.getElementById('save_button').addEventListener('click',function (e) {saveDataWithWarning();});
 	document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
 	document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
 	document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
 	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("","add","-","-","","req","on");});
 	document.getElementById('start_img').addEventListener('click',function (e) {startModify();});
 	document.getElementById('targetPage').value=config.target_page;
+	checkTargetPageField();
 	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
 	document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
 	
@@ -62,6 +63,7 @@ function showParametersScreen() {
 function hideParametersScreen() {
   document.getElementById('main_screen').hidden=false;
   document.getElementById('parameters_screen').hidden=true;
+  saveData();
 }
 
 function showCommentsClick() {
@@ -245,11 +247,13 @@ function isTargetValid(target) {
 * If url patterns are valid save the data to the local storage and restart modify header
 **/
 
+function saveDataWithWarning() {
+  if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
+  saveData();
+}
+
+
 function saveData() {
-  if (!isTargetValid(document.getElementById('targetPage').value)) {
-    alert("Can not save configuration: Url patterns are invalid");
-    return false;
-  }
   localStorage.setItem("config",create_configuration_data()); 
   browser.runtime.sendMessage("reload");
   return true;
