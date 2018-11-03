@@ -1,4 +1,4 @@
-# SimpleModifyHeaders V 1.5
+# SimpleModifyHeaders V 1.6
 
 Extension for firefox and chrome. 
 
@@ -27,7 +27,10 @@ The extension can be start and stop via the button on the top right.
 
 The rules are active in private window mode but you can't use the configuration window in this mode.
 
-If you choose debug mode, detail log messages are available in the extension debugging console of the browser.
+The option button permits to :
+- Activate debug mode: show detail log messages in the extension debugging console of the browser.
+- Show comments : show comments field on the config panel 
+- Filter URL per rules : activate the possiblity to filter url for each rules on the config panel, the header field will be modify only if the url contains the configurated value.
 
 The code is opensource under Mozilla Public License 2.0 
 
