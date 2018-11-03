@@ -5,32 +5,10 @@
   <title>Simple Modify Headers</title>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="bootstrap.min.css"> 
-
-
- <style type="text/css"> 
-
-.title{
-	color: #008CBA;
-}
-
-.select_field{
-	font-size: 14px;
-	height: 30px;
-}
-
-.input_field{
-	font-size: 14px;
-	height: 30px;
-	border: 1px solid #AAAAAA;
-	border-radius: 3px;
-}
-
-.input_url {
-    border: none;
-    border-bottom: 1px solid #AAAAAA;
-}
-</style>
+	<link rel="stylesheet" href="bootstrap.min.css"> 
+	<link rel="stylesheet" type="text/css" href="config.css">
+	<link rel="stylesheet" media="screen and (max-width: 1200px) and (min-width: 1001px)" href="config_medium_screen.css" />
+	<link rel="stylesheet" media="screen and (max-width: 1000px)" href="config_small_screen.css" />
   </head>
 
 <body>
@@ -40,33 +18,36 @@
 <div class="container">
 
 	<!-- MAIN SCREEN  --> 
-	<div id="main_screen">
-		<div class="row">
-    			<div class="col-sm-6">  <h2 class="title"> SIMPLE MODIFY HEADERS  </h2> </div>
-    			<div class="col-sm-6"> <img id="start_img" src="img/start.png" align="right" valign="top"> </img> </div>
-		</div>
- 		<br/>
-
-	
- 		<div class="row">
-   			<div class="col-sm-8">  
-     				<b> Url Patterns* : </b> <input size="50" id="targetPage"  class="form_control input_url" type="text" value="">
-   			</div>
-   			<div class="col-sm-4" align="right"> 
-				<a href="#" id="export_button" class="btn btn-primary btn-sm" >
-          				<span class="glyphicon glyphicon-export"></span> Export
-        			</a> 
-				<a href="#" id="import_button" class="btn btn-primary btn-sm" >
-          				<span class="glyphicon glyphicon-import"></span> Import
-        			</a>
-				<a href="#" id="parameters_button" class="btn btn-primary btn-sm"> 
-          				<span class="glyphicon glyphicon-cog"></span> Parameters
-        			</a>  
-   			</div>
-		</div> 
-
-		<br/>
+	<div id="main_screen">		
 		<center>
+
+			<table class="standard_table">
+				<tr>
+					<td align="left" ><h2 class="title"> SIMPLE MODIFY HEADERS  </h2>  </td>
+					<td align="right"> <img id="start_img" src="img/start.png" align="right" valign="top"> </img> </td>
+				</tr>
+			</table>
+			<br/>
+		
+			<br/>
+			<table class="standard_table">
+				<tr>
+					<td align="left" > <b> Url Patterns* : </b> <input id="targetPage"  class="form_control input_url" type="text" value=""> </td>
+					<td align="right"> 
+						<a href="#" id="export_button" class="btn btn-primary btn-sm" >
+          						<span class="glyphicon glyphicon-export"></span> Export
+        					</a> 
+						<a href="#" id="import_button" class="btn btn-primary btn-sm" >
+          						<span class="glyphicon glyphicon-import"></span> Import
+        					</a>
+						<a href="#" id="parameters_button" class="btn btn-primary btn-sm"> 
+          						<span class="glyphicon glyphicon-cog"></span> Parameters
+        					</a>  
+					</td>
+				</tr>
+			</table>
+			<br/> <br/>
+
   			<table id="table_config" class="table table-condensed " > 
 				<thead>
 					<tr id="config_table_head">
@@ -85,17 +66,31 @@
 				<tbody id="config_tab">
 				</tbody>
   			</table>
-		</center>
-		<center>
-			<a href="#" id="add_button" class="btn btn-primary btn-sm" style="width:100px">
-        			<span class="glyphicon glyphicon-plus"></span> New line
-        		</a> 
-			<a href="#" id="save_button" class="btn btn-primary btn-sm" style="width:100px">
-          			<span class="glyphicon glyphicon-save"></span> Save
-        		</a> 
-		</center>
-	
+			<table class="standard_table"> <tr><td align="center">
+				<a href="#" id="add_button" class="btn btn-primary btn-sm" style="width:100px">
+        				<span class="glyphicon glyphicon-plus"></span> New line
+        			</a> 
+				<a href="#" id="save_button" class="btn btn-primary btn-sm" style="width:100px">
+          				<span class="glyphicon glyphicon-save"></span> Save
+        			</a> 
+			</td></tr></table>
+		
 		<br/>
+
+
+		<table class="standard_table">
+				<tr>
+					<td align="left" >
+						<i style="font-size:10pt"> * Informations on url pattern can be found <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank"> here.</a> <br> An empty string on the field will select all urls. It's possible to select mutliple url patterns using semicolon(;) separator </i>
+ 					</td>
+					<td align="right">
+						<a href="https://github.com/didierfred/SimpleModifyHeaders/tree/V1.5" target="_blank"> <span class="glyphicon glyphicon-question-sign"></span> About </a>
+					</td>
+				</tr>
+		</table>
+
+		</center>
+	<!-- 
 		<div class="row">
 			<div class="col-sm-10">
 				
@@ -107,7 +102,7 @@
 
 				<a href="https://github.com/didierfred/SimpleModifyHeaders/tree/V1.5" target="_blank"> <span class="glyphicon glyphicon-question-sign"></span> About </a>
 			</div>
-		</div>
+		</div> -->
 	</div>
 
 	<!-- PARAMETERS SCREEN -->

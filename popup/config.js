@@ -18,6 +18,9 @@ let header_name_field_size= 20;
 let header_value_field_size= 28;
 let comments_field_size= 28;
 
+let input_field_style="form_control input_field_small";
+
+
 window.onload = function() {
 	// load configuration from local storage
 	let config = JSON.parse(localStorage.getItem("config"));
@@ -88,13 +91,13 @@ function useUrlContainsClick() {
 function appendLine(url_contains,action,header_name,header_value,comment,apply_on,status) {
   let html = "<td";
   if (!use_url_contains) html=html+" hidden";
-  html = html + "><input class=\"form_control input_field\"  size=\""+ url_contains_field_size+ "\" id=\"url_contains"+ line_number + "\"></input></td>";
+  html = html + "><input class=\""+ input_field_style+ "\" id=\"url_contains"+ line_number + "\"></input></td>";
   html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
-  html = html + "<td><input class=\"form_control input_field\"  size=\"" + header_name_field_size + "\" id=\"header_name"+ line_number + "\"></input></td>";
-  html = html + "<td><input class=\"form_control input_field\"  size=\"" + header_value_field_size + "\" id=\"header_value"+ line_number + "\"></input></td>";
+  html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_name"+ line_number + "\"></input></td>";
+  html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_value"+ line_number + "\"></input></td>";
   html = html + "<td";
   if (!show_comments) html=html+" hidden";
-  html = html + "><input class=\"form_control input_field\"  size=\""+ comments_field_size+ "\" id=\"comment"+ line_number + "\"></input></td>";
+  html = html + "><input class=\""+ input_field_style + "\" id=\"comment"+ line_number + "\"></input></td>";
   html = html + "<td><select class=\"form_control select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
   html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button" + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
   html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
@@ -157,36 +160,23 @@ function switchActivateButton(button_number) {
 function reshapeTable() {
   let th_elements = document.querySelectorAll("#config_table_head th");
   let tr_elements = document.querySelectorAll("#config_tab tr");
+
   if (show_comments) {
-    if (use_url_contains) {
-	url_contains_field_size= 18
-    	header_name_field_size= 18;
-    	header_value_field_size= 20;
-        comments_field_size= 20;
-    }
-    else {
-      header_name_field_size= 20;
-      header_value_field_size= 28;
-      comments_field_size= 28;
-    }
+    if (use_url_contains) input_field_style = "form_control input_field_small";
+    else input_field_style = "form_control input_field_medium";
   }
   else {
-    if (use_url_contains) {
-	url_contains_field_size= 28
-    	header_name_field_size= 20;
-    	header_value_field_size= 28;
-    }
-    else {
-      header_name_field_size= 34;
-      header_value_field_size= 42;
-    }
+    if (use_url_contains) input_field_style = "form_control input_field_medium";
+    else input_field_style = "form_control input_field_large";
   }
+
+
   for (i=0;i<tr_elements.length;i++) { 
-    tr_elements[i].childNodes[4].childNodes[0].size=comments_field_size; 
+    tr_elements[i].childNodes[4].childNodes[0].className=input_field_style; 
     tr_elements[i].childNodes[4].hidden = (!show_comments);
-    tr_elements[i].childNodes[3].childNodes[0].size=header_value_field_size;
-    tr_elements[i].childNodes[2].childNodes[0].size=header_name_field_size; 
-    tr_elements[i].childNodes[0].childNodes[0].size=url_contains_field_size; 
+    tr_elements[i].childNodes[3].childNodes[0].className=input_field_style;
+    tr_elements[i].childNodes[2].childNodes[0].className=input_field_style;
+    tr_elements[i].childNodes[0].childNodes[0].className=input_field_style;
     tr_elements[i].childNodes[0].hidden = (!use_url_contains);
   }
   th_elements[4].hidden = (!show_comments);
