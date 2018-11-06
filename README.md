@@ -6,7 +6,7 @@ The extension rewrite the headers based on a rules table.
 
 The extension can be start and stop via the button on the top right.
 
-To save and apply the modification , you need to click on the save button
+To save and apply the modification, you need to click on the save button.
 
 It's possible to: 
 -  export the configuration in a file (json format)
