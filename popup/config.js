@@ -36,7 +36,7 @@ window.onload = function() {
         }
 		
 	for (let to_add of config.headers) appendLine(to_add.url_contains,to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
-	document.getElementById('save_button').addEventListener('click',function (e) {saveDataWithWarning();});
+	document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
 	document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
 	document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
 	document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
@@ -66,7 +66,6 @@ function showParametersScreen() {
 function hideParametersScreen() {
   document.getElementById('main_screen').hidden=false;
   document.getElementById('parameters_screen').hidden=true;
-  saveData();
 }
 
 function showCommentsClick() {
@@ -234,16 +233,13 @@ function isTargetValid(target) {
 }
 
 /**
-* If url patterns are valid save the data to the local storage and restart modify header
+*  save the data to the local storage and restart modify header
+* show a warning if url patterns are invalid
 **/
-
-function saveDataWithWarning() {
-  if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
-  saveData();
-}
 
 
 function saveData() {
+  if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
   localStorage.setItem("config",create_configuration_data()); 
   browser.runtime.sendMessage("reload");
   return true;
@@ -254,13 +250,6 @@ function saveData() {
 **/
 
 function exportData() {
-  if (!isTargetValid(document.getElementById('targetPage').value)) {
-    alert("Can not export : Url pattern  is invalid");
-    return;
-  }
-
-  // Save in local storage
-  saveData();
 
   // Create file data
   let to_export= create_configuration_data();
@@ -314,8 +303,6 @@ function readSingleFile(e) {
       config = JSON.parse(contents);
       // check file format
       if (config.format_version) {
-        // if url pattern invalid , set to "" 
-        if (!isTargetValid(config.target_page)) config.target_page=""; 
 
         // if format file is 1.0 , need to add the apply_on and url_contains value  to translate in format 1.2 
         if (config.format_version==="1.0") {
@@ -325,16 +312,16 @@ function readSingleFile(e) {
             line.url_contains="";
           }
           config.debug_mode=false;
-	  config.show_comments=true;
-	  config.use_url_contains=false;
+	      config.show_comments=true;
+	      config.use_url_contains=false;
         }
 
-	// if format file is 1.1 , need to add url_contains value to translate in format 1.2 
+	    // if format file is 1.1 , need to add url_contains value to translate in format 1.2 
         if (config.format_version==="1.1") {
           config.format_version="1.2";
           for (let line of config.headers) line.url_contains="";
-	  config.show_comments=true;
-	  config.use_url_contains=false;
+	      config.show_comments=true;
+	      config.use_url_contains=false;
         }
 
         // store the conf in the local storage 
@@ -438,12 +425,11 @@ function invertLine(line1, line2) {
 **/
 function startModify() {
   if (started==="off") {
-    if (saveData()) {
+      saveData();
       localStorage.setItem("started","on");
       browser.runtime.sendMessage("on");
       started = "on";
       document.getElementById("start_img").src = "img/stop.png";		
-    }
   }
   else {
     localStorage.setItem("started","off");
