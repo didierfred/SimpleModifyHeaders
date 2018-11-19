@@ -14,16 +14,7 @@ let config ;
 let started = "off";
 let debug_mode = false;
 
-let generic_browser ;
-let is_chrome = false;
 
-// check if chrome 
-if (chrome===undefined) generic_browser=browser;
-else {
-  generic_browser= chrome;
-  is_chrome=true;
-}
-console.log("is_chrome set to " + is_chrome);
 
 // if configuration exist 
 if (localStorage.getItem('config')) {
@@ -80,11 +71,11 @@ else started = localStorage.getItem('started');
 
 if (started==="on") {
   addListener();
-  generic_browser.browserAction.setIcon({ path: "icons/modify-green-32.png"});
+  chrome.browserAction.setIcon({ path: "icons/modify-green-32.png"});
 }
 
 // listen for change in configuration or start/stop 
-generic_browser.runtime.onMessage.addListener(notify);
+chrome.runtime.onMessage.addListener(notify);
 
 
 /*
@@ -190,13 +181,13 @@ function notify(message) {
   }
   else if (message==="off") {
     removeListener();
-    generic_browser.browserAction.setIcon({ path: "icons/modify-32.png"});
+    chrome.browserAction.setIcon({ path: "icons/modify-32.png"});
     started="off";
     if (config.debug_mode) log("Stop modifying headers");
   }
   else if (message==="on") {
     addListener();
-    generic_browser.browserAction.setIcon({ path: "icons/modify-green-32.png"});
+    chrome.browserAction.setIcon({ path: "icons/modify-green-32.png"});
     started="on";
     if (config.debug_mode) log("Start modifying headers");
   }
@@ -210,11 +201,11 @@ function notify(message) {
 function addListener() {
   let target = config.target_page;
   if ((target==="*")||(target==="")||(target===" ")) target="<all_urls>";
-  generic_browser.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
+  chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
                                           {urls: target.split(";")},
                                           ["blocking", "requestHeaders"]);
 
-  generic_browser.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
+  chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
                                           {urls: target.split(";")},
                                           ["blocking", "responseHeaders"]);
 }
@@ -225,8 +216,8 @@ function addListener() {
 *
 */
 function removeListener() {
-  generic_browser.webRequest.onBeforeSendHeaders.removeListener(rewriteRequestHeader);
-  generic_browser.webRequest.onHeadersReceived.removeListener(rewriteResponseHeader);
+  chrome.webRequest.onBeforeSendHeaders.removeListener(rewriteRequestHeader);
+  chrome.webRequest.onHeadersReceived.removeListener(rewriteResponseHeader);
 }
 
 
