@@ -20,8 +20,19 @@ let comments_field_size= 28;
 
 let input_field_style="form_control input_field_small";
 
+let generic_browser ;
+let is_chrome = false;
+
+
 
 window.onload = function() {
+
+	// check if chrome 
+	if (chrome===undefined) generic_browser=browser;
+	else {
+	  generic_browser= chrome;
+	  is_chrome=true;
+	}
 	// load configuration from local storage
 	let config = JSON.parse(localStorage.getItem("config"));
 	if (config.debug_mode) document.getElementById("debug_mode").checked = true;
@@ -241,7 +252,7 @@ function isTargetValid(target) {
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
   localStorage.setItem("config",create_configuration_data()); 
-  browser.runtime.sendMessage("reload");
+  generic_browser.runtime.sendMessage("reload");
   return true;
 }
 
@@ -327,7 +338,7 @@ function readSingleFile(e) {
         // store the conf in the local storage 
         localStorage.setItem("config",JSON.stringify(config));
         // load the new conf 
-        browser.runtime.sendMessage("reload");
+        generic_browser.runtime.sendMessage("reload");
         // reload the configuration page with the new conf
         document.location.href="config.html";
       }
@@ -344,7 +355,7 @@ function readSingleFile(e) {
           // store the conf in the local storage 
           localStorage.setItem("config",JSON.stringify(to_load));
           // load the new conf 
-	  browser.runtime.sendMessage("reload");
+	  generic_browser.runtime.sendMessage("reload");
           // reload the configuration page with the new conf
 	  document.location.href="config.html";	
         }
@@ -427,13 +438,13 @@ function startModify() {
   if (started==="off") {
       saveData();
       localStorage.setItem("started","on");
-      browser.runtime.sendMessage("on");
+      generic_browser.runtime.sendMessage("on");
       started = "on";
       document.getElementById("start_img").src = "img/stop.png";		
   }
   else {
     localStorage.setItem("started","off");
-    browser.runtime.sendMessage("off");
+    generic_browser.runtime.sendMessage("off");
     started = "off";
     document.getElementById("start_img").src = "img/start.png";
   }
