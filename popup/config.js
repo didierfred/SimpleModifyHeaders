@@ -141,7 +141,7 @@ function setButtonStatus(button,status) {
   }
   else {
     button.className="btn btn-default btn-sm";
-    button.innerHTML="OFF <span class=\"glyphicon glyphicon-ban-circle\"></span>"; 
+    button.innerHTML="OFF <span class=\"glyphicon glyphicon-ban-circle\"></span>";
   }
 }
 
@@ -376,7 +376,7 @@ function readSingleFile(e) {
 **/
 function deleteLine(line_number_to_delete) {
   if (line_number_to_delete !== line_number) {
-    for (i=line_number_to_delete;i<line_number-1;i++) {
+    for (let i=line_number_to_delete;i<line_number-1;i++) {
       const j = i+1;
       document.getElementById("select_action"+i).value = document.getElementById("select_action"+j).value;
       document.getElementById("url_contains"+i).value = document.getElementById("url_contains"+j).value;
