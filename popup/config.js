@@ -172,7 +172,7 @@ function reshapeTable() {
   }
 
 
-  for (i=0;i<tr_elements.length;i++) { 
+  for (let i=0;i<tr_elements.length;i++) { 
     tr_elements[i].childNodes[4].childNodes[0].className=input_field_style; 
     tr_elements[i].childNodes[4].hidden = (!show_comments);
     tr_elements[i].childNodes[3].childNodes[0].className=input_field_style;
@@ -227,7 +227,7 @@ function isTargetValid(target) {
   if (target==="") return true;
   if (target===" ") return true;
   if (target==="*") return true;
-  targets=target.split(";");
+  let targets=target.split(";");
   for (i in targets) {
     if (!targets[i].match("(http|https|[\*]):\/\/([\*][\.][^\*]*|[^\*]*|[\*])\/")) return false;
   }

@@ -23,8 +23,8 @@
 
 			<table class="standard_table">
 				<tr>
-					<td align="left" ><h2 class="title"> SIMPLE MODIFY HEADERS  </h2>  </td>
-					<td align="right"> <img id="start_img" src="img/start.png" align="right" valign="top"> </img> </td>
+					<td style="text-align:left"><h2 class="title"> SIMPLE MODIFY HEADERS  </h2>  </td>
+					<td style="text-align:right"> <img id="start_img" src="img/start.png" alt="start/stop" style="float:right;vertical-align:top"> </img> </td>
 				</tr>
 			</table>
 			<br/>
@@ -32,8 +32,8 @@
 			<br/>
 			<table class="standard_table">
 				<tr>
-					<td align="left" > <b> Url Patterns* : </b> <input id="targetPage"  class="form_control input_url" type="text" value=""> </td>
-					<td align="right"> 
+					<td style="text-align:left" > <strong> Url Patterns* : </strong> <input id="targetPage"  class="form_control input_url" type="text" value=""> </td>
+					<td style="text-align:right"> 
 						<a href="#" id="export_button" class="btn btn-primary btn-sm" >
           						<span class="glyphicon glyphicon-export"></span> Export
         					</a> 
@@ -66,7 +66,7 @@
 				<tbody id="config_tab">
 				</tbody>
   			</table>
-			<table class="standard_table"> <tr><td align="center">
+			<table class="standard_table"> <tr><td style="text-align:center">
 				<a href="#" id="add_button" class="btn btn-primary btn-sm" style="width:100px">
         				<span class="glyphicon glyphicon-plus"></span> New line
         			</a> 
@@ -80,10 +80,10 @@
 
 		<table class="standard_table">
 				<tr>
-					<td align="left" >
-						<i style="font-size:10pt"> * Informations on url pattern can be found <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank"> here.</a> <br> An empty string on the field will select all urls. It's possible to select mutliple url patterns using semicolon(;) separator </i>
+					<td style="text-align:left" >
+						<em style="font-size:10pt"> * Informations on url pattern can be found <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank"> here.</a> <br> An empty string on the field will select all urls. It's possible to select mutliple url patterns using semicolon(;) separator </em>
  					</td>
-					<td align="right">
+					<td style="text-align:right">
 						<a href="https://github.com/didierfred/SimpleModifyHeaders/tree/v1.6.2" target="_blank"> <span class="glyphicon glyphicon-question-sign"></span> About </a>
 					</td>
 				</tr>
@@ -97,7 +97,7 @@
 	<div id="parameters_screen" hidden>
 		<h2 class="title"> SIMPLE MODIFY HEADERS  </h2> 
 	
-		<b> Parameters : </b>
+		<strong> Parameters : </strong>
 		<br/>
 		<br/>
 		<input type="checkbox" id="debug_mode"> Debug mode </input>
@@ -115,7 +115,7 @@
 
 
 
-	<iframe id="download" width="0" height="0" frameBorder="0"> 
+	<iframe id="download" title="hidden_download_frame" width="0" height="0" style="border:none;"> 
 	</iframe>
 	<br/>
 	<script type="text/javascript" src="config.js"> </script>
