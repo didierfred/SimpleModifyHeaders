@@ -195,7 +195,7 @@ function create_configuration_data() {
   let headers = [];
   let debug_mode=false;
   let show_comments=false;
-  for (i=0;i<tr_elements.length;i++) {
+  for (let i=0;i<tr_elements.length;i++) {
     const url_contains = tr_elements[i].childNodes[0].childNodes[0].value;
     const action = tr_elements[i].childNodes[1].childNodes[0].value;
     const header_name = tr_elements[i].childNodes[2].childNodes[0].value;
