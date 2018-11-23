@@ -28,8 +28,8 @@ window.onload = function() {
 	let config = JSON.parse(localStorage.getItem("config"));
 	if (config.debug_mode) document.getElementById("debug_mode").checked = true;
 
-	if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;	
-	else if (config.show_comments) document.getElementById("show_comments").checked = true;	
+	if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;
+	else if (config.show_comments) document.getElementById("show_comments").checked = true;
 	else show_comments=false;
 
 	if (config.use_url_contains) {
@@ -50,11 +50,11 @@ window.onload = function() {
 	document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
 	
 	started = localStorage.getItem("started");
-	if (started==="on") document.getElementById("start_img").src = "img/stop.png";	
+	if (started==="on") document.getElementById("start_img").src = "img/stop.png";
 	
 	document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
 	document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
-	reshapeTable();	
+	reshapeTable();
 } 
 
 
@@ -87,23 +87,29 @@ function useUrlContainsClick() {
 
 
 /**
-* Add a new configuration line on the UI 
+* Add a new configuration line on the UI
 **/
 function appendLine(url_contains,action,header_name,header_value,comment,apply_on,status) {
   let html = "<td";
   if (!use_url_contains) html=html+" hidden";
   html = html + "><input class=\""+ input_field_style+ "\" id=\"url_contains"+ line_number + "\"></input></td>";
-  html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
+  html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number 
+			   + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
   html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_name"+ line_number + "\"></input></td>";
   html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_value"+ line_number + "\"></input></td>";
   html = html + "<td";
   if (!show_comments) html=html+" hidden";
   html = html + "><input class=\""+ input_field_style + "\" id=\"comment"+ line_number + "\"></input></td>";
-  html = html + "<td><select class=\"form_control select_field\" id=\"apply_on" + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
-  html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button" + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
-  html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>"; 
-  html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button" + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>"; 
-  html = html +  "<td><a href=\"#\" title=\"Delete line\" id=\"delete_button" + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>"; 
+  html = html + "<td><select class=\"form_control select_field\" id=\"apply_on"
+			  + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
+  html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button" 
+			  + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
+  html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button"
+			  + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>";
+  html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button" 
+		      + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>";
+  html = html +  "<td><a href=\"#\" title=\"Delete line\" id=\"delete_button"
+			  + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>";
 
   let newTR = document.createElement("tr");
   newTR.id="line" + line_number;
@@ -147,7 +153,7 @@ function getButtonStatus(button) {
 
 function switchActivateButton(button_number) {
   const activate_button = document.getElementById("activate_button"+button_number);
-  // Button is ON 
+  // Button is ON
   if (getButtonStatus(activate_button)==="on") setButtonStatus(activate_button,"off");
   // Button is OFF
   else setButtonStatus(activate_button,"on");
@@ -173,7 +179,7 @@ function reshapeTable() {
 
 
   for (let i=0;i<tr_elements.length;i++) { 
-    tr_elements[i].childNodes[4].childNodes[0].className=input_field_style; 
+    tr_elements[i].childNodes[4].childNodes[0].className=input_field_style;
     tr_elements[i].childNodes[4].hidden = (!show_comments);
     tr_elements[i].childNodes[3].childNodes[0].className=input_field_style;
     tr_elements[i].childNodes[2].childNodes[0].className=input_field_style;
@@ -181,7 +187,7 @@ function reshapeTable() {
     tr_elements[i].childNodes[0].hidden = (!use_url_contains);
   }
   th_elements[4].hidden = (!show_comments);
-  th_elements[0].hidden = (!use_url_contains);	
+  th_elements[0].hidden = (!use_url_contains);
 }
 
 
@@ -205,10 +211,11 @@ function create_configuration_data() {
     const status = getButtonStatus(tr_elements[i].childNodes[6].childNodes[0]);
     headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
   }
-  if (document.getElementById("debug_mode").checked) debug_mode=true ;
-  if (document.getElementById("show_comments").checked) show_comments=true ;	
-  if (document.getElementById("use_url_contains").checked) use_url_contains=true ;
-  let to_export = {format_version:"1.2",target_page:document.getElementById('targetPage').value,headers:headers,debug_mode:debug_mode,show_comments:show_comments,use_url_contains:use_url_contains};
+  if (document.getElementById("debug_mode").checked) debug_mode=true;
+  if (document.getElementById("show_comments").checked) show_comments=true;	
+  if (document.getElementById("use_url_contains").checked) use_url_contains=true;
+  let to_export = {format_version:"1.2",target_page:document.getElementById('targetPage').value,headers:headers,
+				  debug_mode:debug_mode,show_comments:show_comments,use_url_contains:use_url_contains};
   return JSON.stringify(to_export);
 }
 
@@ -228,7 +235,7 @@ function isTargetValid(target) {
   if (target===" ") return true;
   if (target==="*") return true;
   let targets=target.split(";");
-  for (i in targets) {
+  for (let i in targets) {
     if (!targets[i].match("(http|https|[\*]):\/\/([\*][\.][^\*]*|[^\*]*|[\*])\/")) return false;
   }
   return true;
@@ -242,7 +249,7 @@ function isTargetValid(target) {
 
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
-  localStorage.setItem("config",create_configuration_data()); 
+  localStorage.setItem("config",create_configuration_data());
   chrome.runtime.sendMessage("reload");
   return true;
 }
@@ -256,7 +263,7 @@ function exportData() {
   // Create file data
   let to_export= create_configuration_data();
 	
-  // Create file to save 
+  // Create file to save
   let a         = document.createElement('a');
   a.href        = 'data:attachment/json,' +  encodeURIComponent(to_export);
   a.target      = 'download';
@@ -300,7 +307,7 @@ function readSingleFile(e) {
   let reader = new FileReader();
   reader.onload = function(e) {
     let contents = e.target.result;
-    let config="";	
+    let config="";
     try {
       config = JSON.parse(contents);
       // check file format
@@ -326,9 +333,9 @@ function readSingleFile(e) {
 	      config.use_url_contains=false;
         }
 
-        // store the conf in the local storage 
+        // store the conf in the local storage
         localStorage.setItem("config",JSON.stringify(config));
-        // load the new conf 
+        // load the new conf
         chrome.runtime.sendMessage("reload");
         // reload the configuration page with the new conf
         document.location.href="config.html";
@@ -338,17 +345,19 @@ function readSingleFile(e) {
         if (config[0].action) {
 	  let headers = [];
 	  for (let line_to_load of config) {
-            var enabled = "off"; 
+            var enabled = "off";
             if (line_to_load.enabled) enabled = "on";
-	    if (line_to_load.action==="Filter") line_to_load.action="delete";			   headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
+	    if (line_to_load.action==="Filter") line_to_load.action="delete";			   
+		headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,
+					header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
 	  }
 	  let to_load = {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
-          // store the conf in the local storage 
+          // store the conf in the local storage
           localStorage.setItem("config",JSON.stringify(to_load));
           // load the new conf 
 	  chrome.runtime.sendMessage("reload");
           // reload the configuration page with the new conf
-	  document.location.href="config.html";	
+	  document.location.href="config.html";
         }
         else  alert("invalid file format");
       }
@@ -394,7 +403,7 @@ function invertLine(line1, line2) {
   // if a line does not exist , do nothing
   if ((line1===0)||(line2===0)||(line1>=line_number)||(line2>=line_number)) return;
 
-  // Save data for line 1 
+  // Save data for line 1
   const select_action1= document.getElementById("select_action"+line1).value;
   const url_contains1 = document.getElementById("url_contains"+line1).value;
   const header_name1 = document.getElementById("header_name"+line1).value;
@@ -431,7 +440,7 @@ function startModify() {
       localStorage.setItem("started","on");
       chrome.runtime.sendMessage("on");
       started = "on";
-      document.getElementById("start_img").src = "img/stop.png";		
+      document.getElementById("start_img").src = "img/stop.png";	
   }
   else {
     localStorage.setItem("started","off");

@@ -10,7 +10,7 @@
 
 "use strict";
 
-let config ;
+let config;
 let started = "off";
 let debug_mode = false;
 
@@ -19,9 +19,9 @@ let debug_mode = false;
 // if configuration exist 
 if (localStorage.getItem('config')) {
   console.log("Load standard config");
-  config= JSON.parse(localStorage.getItem('config'));	
+  config= JSON.parse(localStorage.getItem('config'));
   
- // If config 1.0 (Simple Modify headers V1.2) , save to format 1.1	
+ // If config 1.0 (Simple Modify headers V1.2) , save to format 1.1
   if (config.format_version==="1.0") {
     config.format_version="1.1";
     for (let line of config.headers) line.apply_on="req";
@@ -49,7 +49,7 @@ else {
       headers.push({action:to_modify[0],url_contains:"",header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
     }
     config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false};
-    // save old config in new format 
+    // save old config in new format
     localStorage.setItem("config",JSON.stringify(config));
   }
   //else no config exists, create a default one
@@ -58,13 +58,13 @@ else {
     let headers = [];
     headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
     config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
-    // save configuration 
+    // save configuration
     localStorage.setItem("config",JSON.stringify(config));
   }
 }
 		
 		
-// If no started value stored , use a default one 
+// If no started value stored , use a default one
 if (!localStorage.getItem('started')) localStorage.setItem('started',started);
 else started = localStorage.getItem('started');
 
@@ -74,12 +74,12 @@ if (started==="on") {
   chrome.browserAction.setIcon({ path: "icons/modify-green-32.png"});
 }
 
-// listen for change in configuration or start/stop 
+// listen for change in configuration or start/stop
 chrome.runtime.onMessage.addListener(notify);
 
 
 /*
-* Standard function to log messages 
+* Standard function to log messages
 *
 */
 
@@ -98,12 +98,15 @@ function rewriteRequestHeader(e) {
       if (to_modify.action==="add"){
         let new_header = {"name" :to_modify.header_name,"value":to_modify.header_value};
         e.requestHeaders.push(new_header);
-	if (config.debug_mode) log("Add request header : name=" + to_modify.header_name + ",value=" + to_modify.header_value + " for url " + e.url);
+		if (config.debug_mode) log("Add request header : name=" + to_modify.header_name +
+		  ",value=" + to_modify.header_value + " for url " + e.url);
       }
       else if (to_modify.action==="modify") {
 	for (let header of e.requestHeaders) {
           if (header.name.toLowerCase() === to_modify.header_name.toLowerCase()) {
-            if (config.debug_mode) log("Modify request header :  name= " + to_modify.header_name + ",old value=" + header.value +  ",new value=" + to_modify.header_value + " for url " + e.url);
+            if (config.debug_mode) log("Modify request header :  name= " + to_modify.header_name +
+			  ",old value=" + header.value +  ",new value=" + to_modify.header_value +
+			  " for url " + e.url);
             header.value = to_modify.header_value;
           }
         }
@@ -115,7 +118,8 @@ function rewriteRequestHeader(e) {
         }
 	if (index!==-1) {
           e.requestHeaders.splice(index,1);
-          if (config.debug_mode) log("Delete request header :  name=" + to_modify.header_name.toLowerCase() + " for url " + e.url);
+          if (config.debug_mode) log("Delete request header :  name=" + to_modify.header_name.toLowerCase() +
+		    " for url " + e.url);
         }
       }
     }
@@ -136,12 +140,14 @@ function rewriteResponseHeader(e) {
       if (to_modify.action==="add") {
         let new_header = {"name" :to_modify.header_name,"value":to_modify.header_value};
 	e.responseHeaders.push(new_header);
-	if (config.debug_mode) log("Add response header : name=" + to_modify.header_name + ",value=" + to_modify.header_value + " for url " + e.url);
+	if (config.debug_mode) log("Add response header : name=" + to_modify.header_name
+							+ ",value=" + to_modify.header_value + " for url " + e.url);
       }
       else if (to_modify.action==="modify") {
         for (let header of e.responseHeaders) {
           if (header.name.toLowerCase() === to_modify.header_name.toLowerCase()) {
-            if (config.debug_mode) log("Modify response header :  name= " + to_modify.header_name + ",old value=" + header.value +  ",new value=" + to_modify.header_value  + " for url " + e.url);
+            if (config.debug_mode) log("Modify response header :  name= " + to_modify.header_name + ",old value="
+										+ header.value +  ",new value=" + to_modify.header_value  + " for url " + e.url);
             header.value = to_modify.header_value;
           }
         }
@@ -153,7 +159,8 @@ function rewriteResponseHeader(e) {
 	}
         if (index!==-1) {
           e.responseHeaders.splice(index,1);
-          if (config.debug_mode) log("Delete response header :  name=" + to_modify.header_name.toLowerCase() + " for url " + e.url);					
+          if (config.debug_mode) log("Delete response header :  name=" + to_modify.header_name.toLowerCase()
+									+ " for url " + e.url);		
         }
       }
     }
@@ -165,8 +172,8 @@ function rewriteResponseHeader(e) {
 
 /*
 * Listen for message form config.js
-* if message is reload : reload the configuration 
-* if message is on : start the modify header 
+* if message is reload : reload the configuration
+* if message is on : start the modify header
 * if message is off : stop the modify header
 *
 **/
@@ -174,7 +181,7 @@ function notify(message) {
   if (message==="reload") {
     if (config.debug_mode) log("Reload configuration");
     config=JSON.parse(localStorage.getItem("config"));
-    if (started==="on") {		
+    if (started==="on") {
       removeListener();
       addListener();
     }
@@ -212,7 +219,7 @@ function addListener() {
 
 
 /*
-* Remove the two listener 
+* Remove the two listener
 *
 */
 function removeListener() {
