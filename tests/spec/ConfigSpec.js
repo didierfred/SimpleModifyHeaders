@@ -1,0 +1,315 @@
+describe("Config", function() {
+  
+  function cleanConfigTableForTest() {
+    let tr_elements = document.querySelectorAll("#config_tab tr");
+     for (let i=0;i<tr_elements.length;i++) {
+      tr_elements[i].parentNode.removeChild(tr_elements[i]);
+     }
+  }
+
+  function createDefaultConfigForTest() {
+     let headers = [];
+     headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
+     config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
+     // save configuration
+     localStorage.setItem("config",JSON.stringify(config));
+  }
+
+  describe("#function initConfigurationPage", function() {
+ 
+    beforeEach(function() {
+	createDefaultConfigForTest();
+    });
+	
+    it("init default value should be ok ", function() {
+      initConfigurationPage();
+      expect(document.getElementById("debug_mode").checked).toEqual(false);
+      expect(document.getElementById("show_comments").checked).toEqual(true);
+      expect(document.getElementById("use_url_contains").checked).toEqual(false);
+      expect(document.getElementById("targetPage").value).toEqual("https://httpbin.org/*");
+      expect(document.getElementById("url_contains1").value).toEqual("");
+      expect(document.getElementById("select_action1").value).toEqual("add");
+      expect(document.getElementById("header_name1").value).toEqual("test-header-name");
+      expect(document.getElementById("header_value1").value).toEqual("test-header-value");
+      expect(document.getElementById("comment1").value).toEqual("test");
+      expect(document.getElementById("apply_on1").value).toEqual("req");
+      expect(document.getElementById("activate_button1").className).toEqual("btn btn-primary btn-sm");
+    });
+
+    beforeEach(function() {
+     cleanConfigTableForTest();
+    });
+  });
+
+
+  describe("#function appendLine", function() {
+ 
+    beforeEach(function() {
+	createDefaultConfigForTest();
+    });
+	
+    it("append one line should create a new line and not more  ", function() {
+      initConfigurationPage();
+      appendLine("test","add","-","-","","req","on");
+      expect(document.getElementById("url_contains2")).not.toEqual(null); 
+      expect(document.getElementById("url_contains3")).toEqual(null); 
+    });
+
+
+    it("append two lines should create two lines and not more ", function() {
+      initConfigurationPage();
+      appendLine("test","add","-","-","","req","on");
+      appendLine("test","add","-","-","","req","on");
+      expect(document.getElementById("url_contains2")).not.toEqual(null); 
+      expect(document.getElementById("url_contains3")).not.toEqual(null); 
+      expect(document.getElementById("url_contains4")).toEqual(null); 
+    });
+
+    it("append three lines should create three lines and not more ", function() {
+      initConfigurationPage();
+      appendLine("test","add","-","-","","req","on");
+      appendLine("test","add","-","-","","req","on");
+      appendLine("test","add","-","-","","req","on");
+      expect(document.getElementById("url_contains2")).not.toEqual(null); 
+      expect(document.getElementById("url_contains3")).not.toEqual(null); 
+      expect(document.getElementById("url_contains4")).not.toEqual(null); 
+      expect(document.getElementById("url_contains5")).toEqual(null); 
+    });
+
+    afterEach(function() {
+     cleanConfigTableForTest();
+    });
+  });
+
+
+
+ describe("#function deleteLine", function() {
+ 
+    beforeEach(function() {
+	createDefaultConfigForTest();
+    });
+	
+
+    it("delete line 3 should delete line 3 form the GUI ", function() {
+      initConfigurationPage();
+      appendLine("line2","add","header_name2","header_value2","comment2","req","on");
+      appendLine("line3","add","header_name3","header_value3","comment3","req","on");
+      appendLine("line4","modify","test_name","test_value","test_comment","res","off");
+      deleteLine(3); 
+      expect(document.getElementById("url_contains4")).toEqual(null); 
+      expect(document.getElementById("url_contains3").value).toEqual("line4");
+      expect(document.getElementById("select_action3").value).toEqual("modify");
+      expect(document.getElementById("header_name3").value).toEqual("test_name");
+      expect(document.getElementById("header_value3").value).toEqual("test_value");
+      expect(document.getElementById("comment3").value).toEqual("test_comment");
+      expect(document.getElementById("apply_on3").value).toEqual("res");
+      expect(document.getElementById("activate_button3").className).toEqual("btn btn-default btn-sm");
+      expect(document.getElementById("url_contains2").value).toEqual("line2"); 
+      expect(document.getElementById("header_name2").value).toEqual("header_name2");
+      expect(document.getElementById("header_value2").value).toEqual("header_value2");
+      expect(document.getElementById("comment2").value).toEqual("comment2");
+    });
+
+
+    it("delete line 1 should delete line 1 form the GUI ", function() {
+      initConfigurationPage();
+      appendLine("line2","add","-","-","","req","on");
+      appendLine("line3","add","-","-","","req","on");
+      appendLine("line4","add","-","-","","req","on");
+      deleteLine(1); 
+      expect(document.getElementById("url_contains4")).toEqual(null); 
+      expect(document.getElementById("url_contains3").value).toEqual("line4");
+      expect(document.getElementById("url_contains2").value).toEqual("line3"); 
+      expect(document.getElementById("url_contains1").value).toEqual("line2"); 
+    });
+
+
+    afterEach(function() {
+     cleanConfigTableForTest();
+    });
+  });
+
+
+describe("#function invertLine", function() {
+ 
+    beforeEach(function() {
+	createDefaultConfigForTest();
+    });
+	
+
+    it("invert line 2 with line 3 should invert line on the GUI ", function() {
+      initConfigurationPage();
+      appendLine("line2","add","header_name2","header_value2","comment2","res","off");
+      appendLine("line3","delete","header_name3","header_value3","comment3","req","on");
+      appendLine("line4","modify","test_name","test_value","test_comment","res","off");
+      invertLine(2,3); 
+      expect(document.getElementById("url_contains4").value).toEqual("line4"); 
+      expect(document.getElementById("url_contains3").value).toEqual("line2");
+      expect(document.getElementById("url_contains2").value).toEqual("line3");
+      expect(document.getElementById("select_action3").value).toEqual("add");
+      expect(document.getElementById("select_action2").value).toEqual("delete");
+      expect(document.getElementById("header_name3").value).toEqual("header_name2");
+      expect(document.getElementById("header_name2").value).toEqual("header_name3")
+      expect(document.getElementById("header_value3").value).toEqual("header_value2");
+      expect(document.getElementById("header_value2").value).toEqual("header_value3");
+      expect(document.getElementById("comment3").value).toEqual("comment2");
+      expect(document.getElementById("comment2").value).toEqual("comment3");
+      expect(document.getElementById("apply_on3").value).toEqual("res");
+      expect(document.getElementById("apply_on2").value).toEqual("req");
+      expect(document.getElementById("activate_button3").className).toEqual("btn btn-default btn-sm"); // button off
+      expect(document.getElementById("activate_button2").className).toEqual("btn btn-primary btn-sm"); // button on 
+    });
+
+
+    it("invert line 0 with line 3 should do nothing  ", function() {
+      initConfigurationPage();
+      appendLine("line2","add","header_name2","header_value2","comment2","res","off");
+      appendLine("line3","delete","header_name3","header_value3","comment3","req","on");
+      appendLine("line4","modify","test_name","test_value","test_comment","res","off");
+      invertLine(0,3); 
+
+      expect(document.getElementById("url_contains1").value).toEqual("");
+      expect(document.getElementById("select_action1").value).toEqual("add");
+      expect(document.getElementById("header_name1").value).toEqual("test-header-name");
+      expect(document.getElementById("header_value1").value).toEqual("test-header-value");
+      expect(document.getElementById("comment1").value).toEqual("test");
+      expect(document.getElementById("apply_on1").value).toEqual("req");
+      expect(document.getElementById("activate_button1").className).toEqual("btn btn-primary btn-sm");
+
+
+      expect(document.getElementById("url_contains4").value).toEqual("line4"); 
+      expect(document.getElementById("url_contains3").value).toEqual("line3");
+      expect(document.getElementById("url_contains2").value).toEqual("line2");
+      expect(document.getElementById("select_action3").value).toEqual("delete");
+      expect(document.getElementById("select_action2").value).toEqual("add");
+      expect(document.getElementById("header_name3").value).toEqual("header_name3");
+      expect(document.getElementById("header_name2").value).toEqual("header_name2")
+      expect(document.getElementById("header_value3").value).toEqual("header_value3");
+      expect(document.getElementById("header_value2").value).toEqual("header_value2");
+      expect(document.getElementById("comment3").value).toEqual("comment3");
+      expect(document.getElementById("comment2").value).toEqual("comment2");
+      expect(document.getElementById("apply_on3").value).toEqual("req");
+      expect(document.getElementById("apply_on2").value).toEqual("res");
+      expect(document.getElementById("activate_button2").className).toEqual("btn btn-default btn-sm"); // button off
+      expect(document.getElementById("activate_button3").className).toEqual("btn btn-primary btn-sm"); // button on 
+    });
+
+   it("invert line 4 with line 5 should do nothing  ", function() {
+      initConfigurationPage();
+      appendLine("line2","add","header_name2","header_value2","comment2","res","off");
+      appendLine("line3","delete","header_name3","header_value3","comment3","req","on");
+      appendLine("line4","modify","test_name","test_value","test_comment","res","off");
+      invertLine(4,5); 
+
+      expect(document.getElementById("url_contains1").value).toEqual("");
+      expect(document.getElementById("select_action1").value).toEqual("add");
+      expect(document.getElementById("header_name1").value).toEqual("test-header-name");
+      expect(document.getElementById("header_value1").value).toEqual("test-header-value");
+      expect(document.getElementById("comment1").value).toEqual("test");
+      expect(document.getElementById("apply_on1").value).toEqual("req");
+      expect(document.getElementById("activate_button1").className).toEqual("btn btn-primary btn-sm");// button on 
+
+      expect(document.getElementById("url_contains4").value).toEqual("line4");
+      expect(document.getElementById("select_action4").value).toEqual("modify");
+      expect(document.getElementById("header_name4").value).toEqual("test_name");
+      expect(document.getElementById("header_value4").value).toEqual("test_value");
+      expect(document.getElementById("comment4").value).toEqual("test_comment");
+      expect(document.getElementById("apply_on4").value).toEqual("res");
+      expect(document.getElementById("activate_button4").className).toEqual("btn btn-default btn-sm");// button off
+
+      expect(document.getElementById("url_contains3").value).toEqual("line3");
+      expect(document.getElementById("url_contains2").value).toEqual("line2");
+      expect(document.getElementById("select_action3").value).toEqual("delete");
+      expect(document.getElementById("select_action2").value).toEqual("add");
+      expect(document.getElementById("header_name3").value).toEqual("header_name3");
+      expect(document.getElementById("header_name2").value).toEqual("header_name2")
+      expect(document.getElementById("header_value3").value).toEqual("header_value3");
+      expect(document.getElementById("header_value2").value).toEqual("header_value2");
+      expect(document.getElementById("comment3").value).toEqual("comment3");
+      expect(document.getElementById("comment2").value).toEqual("comment2");
+      expect(document.getElementById("apply_on3").value).toEqual("req");
+      expect(document.getElementById("apply_on2").value).toEqual("res");
+      expect(document.getElementById("activate_button2").className).toEqual("btn btn-default btn-sm"); // button off
+      expect(document.getElementById("activate_button3").className).toEqual("btn btn-primary btn-sm"); // button on 
+    });
+
+    afterEach(function() {
+     cleanConfigTableForTest();
+    });
+  });
+
+  describe("#function isTargetValid ", function() {
+
+    it("should validate the * pattern", function() {
+      expect(isTargetValid("*")).toEqual(true);
+    });
+
+    it("should validate the empty pattern", function() {
+      expect(isTargetValid("")).toEqual(true);
+    });
+
+    it("should validate the \" \" pattern", function() {
+      expect(isTargetValid(" ")).toEqual(true);
+    });
+
+    it("should validate the *://*/* pattern", function() {
+      expect(isTargetValid("*://*/*")).toEqual(true);
+    });
+
+    it("should validate the http://*/* pattern", function() {
+      expect(isTargetValid("http://*/*")).toEqual(true);
+    });
+
+    it("should validate the http://test/* pattern", function() {
+      expect(isTargetValid("http://test/*")).toEqual(true);
+    });
+
+    it("should  validate the *://*/ pattern", function() {
+      expect(isTargetValid("*://*/")).toEqual(true);
+    });
+
+    it("should validate the http://test/ pattern", function() {
+      expect(isTargetValid("http://test/")).toEqual(true);
+    });
+
+    it("should validate the https://test/test pattern", function() {
+      expect(isTargetValid("https://test/test")).toEqual(true);
+    });
+
+    it("should not validate the *://*.test/ pattern", function() {
+      expect(isTargetValid("*://*.test/")).toEqual(true);
+    });
+
+    it("should not validate the test pattern", function() {
+      expect(isTargetValid("test")).toEqual(false);
+    });
+
+    it("should not validate the *://* pattern", function() {
+      expect(isTargetValid("*://*")).toEqual(false);
+    });
+
+    it("should not validate the tty://*/ pattern", function() {
+      expect(isTargetValid("tty://*/")).toEqual(false);
+    });
+
+    it("should not validate the *:/*/ pattern", function() {
+      expect(isTargetValid("*:/*/")).toEqual(false);
+    });
+
+  });
+
+  describe("#function checkTargetPageField ", function() {
+
+    it("text field url pattern should be black id pattern is valid", function() {
+	document.getElementById('targetPage').value = "*"
+	checkTargetPageField();
+        expect(document.getElementById('targetPage').style.color).toEqual("black");
+    });
+
+    it("text field url pattern should be red if pattern is invalid", function() {
+	document.getElementById('targetPage').value = "test"
+	checkTargetPageField();
+        expect(document.getElementById('targetPage').style.color).toEqual("red");
+    });
+  });
+});
