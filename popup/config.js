@@ -340,25 +340,8 @@ function loadConfiguration(configuration) {
     config = JSON.parse(configuration);
     // check file format
     if (config.format_version) {
-
-      // if format file is 1.0 , need to add the apply_on and url_contains value  to translate in format 1.2 
-      if (config.format_version==="1.0") {
-        config.format_version="1.2";
-        for (let line of config.headers) {
-          line.apply_on="req";
-          line.url_contains="";
-        }
-        config.debug_mode=false;
-	config.show_comments=true;
-	config.use_url_contains=false;
-      }
-      // if format file is 1.1 , need to add url_contains value to translate in format 1.2 
-      if (config.format_version==="1.1") {
-        config.format_version="1.2";
-        for (let line of config.headers) line.url_contains="";
-        config.show_comments=true;
-        config.use_url_contains=false;
-      }
+      if (config.format_version==="1.0") config = convertConfigurationFormat1dot0ToCurrentFormat(config); 
+      else if (config.format_version==="1.1") config = convertConfigurationFormat1dot1ToCurrentFormat(config);
     }
     else {
       // try modify header add-on file format  : array of {action,name,value,comment,enabled}
@@ -391,6 +374,27 @@ function loadConfiguration(configuration) {
  // load the new conf 
   reloadConfigPage();
 }
+
+function convertConfigurationFormat1dot0ToCurrentFormat(config) {
+  config.format_version="1.2";
+  for (let line of config.headers) {
+    line.apply_on="req";
+    line.url_contains="";
+  }
+  config.debug_mode=false;
+  config.show_comments=true;
+  config.use_url_contains=false;
+  return config;
+ }
+
+
+function convertConfigurationFormat1dot1ToCurrentFormat(config) {
+  config.format_version="1.2";
+  for (let line of config.headers) line.url_contains="";
+    config.show_comments=true;
+    config.use_url_contains=false;
+  return config;
+ }
 
 
 function reloadConfigPage() {
