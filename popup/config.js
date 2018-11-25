@@ -374,7 +374,7 @@ function loadConfiguration(configuration) {
 	config = {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
       }
       else {
-        alert("invalid file format");
+        alert("Invalid file format");
 	return;
       }
     }
@@ -387,11 +387,16 @@ function loadConfiguration(configuration) {
 
   // store the conf in the local storage
   localStorage.setItem("config",JSON.stringify(config));
-  // load the new conf
-  chrome.runtime.sendMessage("reload");
-  // reload the configuration page with the new conf
-  document.location.href="config.html";
+  
+ // load the new conf 
+  reloadConfigPage();
 }
+
+
+function reloadConfigPage() {
+  chrome.runtime.sendMessage("reload");
+  document.location.href="config.html";
+  }
 
 
 /**
