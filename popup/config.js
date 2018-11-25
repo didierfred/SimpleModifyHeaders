@@ -9,21 +9,40 @@
  */
 
 
-let line_number = 1;
-let started = "off";
-let show_comments = true;
-let use_url_contains = false;
-let url_contains_field_size= 18;
-let header_name_field_size= 20;
-let header_value_field_size= 28;
-let comments_field_size= 28;
-
-let input_field_style="form_control input_field_small";
+let line_number;
+let started;
+let show_comments;
+let use_url_contains;
+let url_contains_field_size;
+let header_name_field_size;
+let header_value_field_size;
+let comments_field_size;
+let input_field_style;
 
 
 
 window.onload = function() {
+   initConfigurationPage();
+ }
 
+
+function initGlobalValue()
+ {
+  line_number = 1;
+  started = "off";
+  show_comments = true;
+  use_url_contains = false;
+  url_contains_field_size= 18;
+  header_name_field_size= 20;
+  header_value_field_size= 28;
+  comments_field_size= 28;
+  input_field_style="form_control input_field_small"
+ }
+
+
+function initConfigurationPage() {
+
+	initGlobalValue();
 	// load configuration from local storage
 	let config = JSON.parse(localStorage.getItem("config"));
 	if (config.debug_mode) document.getElementById("debug_mode").checked = true;
@@ -295,9 +314,9 @@ function importData(evt) {
 }
 
 /**
-* Import data from a file
+* Import configuration from a file
 *
-* If format is not recognized , try modify header add-an file format
+* 
 *
 **/
 
@@ -305,69 +324,73 @@ function readSingleFile(e) {
   let file = e.target.files[0];
   if (!file) return;
   let reader = new FileReader();
-  reader.onload = function(e) {
-    let contents = e.target.result;
-    let config="";
-    try {
-      config = JSON.parse(contents);
-      // check file format
-      if (config.format_version) {
+  reader.onload = function(e) { 
+    loadConfiguration(e.target.result);
+  }
+  reader.readAsText(file);
+}
 
-        // if format file is 1.0 , need to add the apply_on and url_contains value  to translate in format 1.2 
-        if (config.format_version==="1.0") {
-          config.format_version="1.2";
-          for (let line of config.headers) {
-            line.apply_on="req";
-            line.url_contains="";
-          }
-          config.debug_mode=false;
-	      config.show_comments=true;
-	      config.use_url_contains=false;
+/**
+* Load configuration from a string 
+* If format is not recognized , try modify header add-an file format
+**/
+function loadConfiguration(configuration) {
+  let config="";
+  try {
+    config = JSON.parse(configuration);
+    // check file format
+    if (config.format_version) {
+
+      // if format file is 1.0 , need to add the apply_on and url_contains value  to translate in format 1.2 
+      if (config.format_version==="1.0") {
+        config.format_version="1.2";
+        for (let line of config.headers) {
+          line.apply_on="req";
+          line.url_contains="";
         }
-
-	    // if format file is 1.1 , need to add url_contains value to translate in format 1.2 
-        if (config.format_version==="1.1") {
-          config.format_version="1.2";
-          for (let line of config.headers) line.url_contains="";
-	      config.show_comments=true;
-	      config.use_url_contains=false;
-        }
-
-        // store the conf in the local storage
-        localStorage.setItem("config",JSON.stringify(config));
-        // load the new conf
-        chrome.runtime.sendMessage("reload");
-        // reload the configuration page with the new conf
-        document.location.href="config.html";
+        config.debug_mode=false;
+	config.show_comments=true;
+	config.use_url_contains=false;
+      }
+      // if format file is 1.1 , need to add url_contains value to translate in format 1.2 
+      if (config.format_version==="1.1") {
+        config.format_version="1.2";
+        for (let line of config.headers) line.url_contains="";
+        config.show_comments=true;
+        config.use_url_contains=false;
+      }
+    }
+    else {
+      // try modify header add-on file format  : array of {action,name,value,comment,enabled}
+      if (config[0].action) {
+	let headers = [];
+	for (let line_to_load of config) {
+          var enabled = "off";
+          if (line_to_load.enabled) enabled = "on";
+	  if (line_to_load.action==="Filter") line_to_load.action="delete";			   
+	  headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,
+					header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
+	}
+	config = {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
       }
       else {
-        // try modify header add-on file format  : array of {action,name,value,comment,enabled}
-        if (config[0].action) {
-	  let headers = [];
-	  for (let line_to_load of config) {
-            var enabled = "off";
-            if (line_to_load.enabled) enabled = "on";
-	    if (line_to_load.action==="Filter") line_to_load.action="delete";			   
-		headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,
-					header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
-	  }
-	  let to_load = {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
-          // store the conf in the local storage
-          localStorage.setItem("config",JSON.stringify(to_load));
-          // load the new conf 
-	  chrome.runtime.sendMessage("reload");
-          // reload the configuration page with the new conf
-	  document.location.href="config.html";
-        }
-        else  alert("invalid file format");
+        alert("invalid file format");
+	return;
       }
     }
-    catch(error) {
-      console.log(error);
-      alert("Invalid file format");
-    }
-  };
-  reader.readAsText(file);
+  }
+  catch(error) {
+    console.log(error);
+    alert("Invalid file format");
+    return;
+  }
+
+  // store the conf in the local storage
+  localStorage.setItem("config",JSON.stringify(config));
+  // load the new conf
+  chrome.runtime.sendMessage("reload");
+  // reload the configuration page with the new conf
+  document.location.href="config.html";
 }
 
 
