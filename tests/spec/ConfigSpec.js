@@ -10,7 +10,7 @@ describe("Config", function() {
   function createDefaultConfigForTest() {
      let headers = [];
      headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
-     config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
+     config = {format_version:"1.2",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
      // save configuration
      localStorage.setItem("config",JSON.stringify(config));
   }
@@ -36,10 +36,120 @@ describe("Config", function() {
       expect(document.getElementById("activate_button1").className).toEqual("btn btn-primary btn-sm");
     });
 
-    beforeEach(function() {
+    afterEach(function() {
      cleanConfigTableForTest();
     });
   });
+
+  describe("#function create_configuration_data", function() {
+ 
+    beforeEach(function() {
+	createDefaultConfigForTest();
+    });
+	
+    it("configuration data should reflect the configuration on the screen ", function() {
+      initConfigurationPage();
+      var config = JSON.parse(create_configuration_data());
+      expect(config.format_version).toEqual("1.2");
+      expect(config.target_page).toEqual("https://httpbin.org/*");
+      expect(config.show_comments).toEqual(true);
+      expect(config.use_url_contains).toEqual(false);
+      expect(config.debug_mode).toEqual(false);
+      expect(config.headers[0].url_contains).toEqual("");
+      expect(config.headers[0].action).toEqual("add");
+      expect(config.headers[0].header_name).toEqual("test-header-name");
+      expect(config.headers[0].header_value).toEqual("test-header-value");
+      expect(config.headers[0].comment).toEqual("test");
+      expect(config.headers[0].apply_on).toEqual("req");
+      expect(config.headers[0].status).toEqual("on");
+    });
+
+    afterEach(function() {
+     cleanConfigTableForTest();
+    });
+  });
+
+
+  describe("#function loadConfiguration", function() {
+
+  // mock 
+   let mockAlertMessage="";
+   reloadConfigPage= function() {};
+   alert = function(message) {mockAlertMessage= message;}
+
+
+
+    it("should load configuration on format 1.0  ", function() {
+      const config= '{"format_version":"1.0","target_page":"https://httpbin.org/*","headers":[{"action":"add","header_name":"test-header-name","header_value":"test-header-value","comment":"test","status":"on"}]}';
+
+      loadConfiguration(config);
+      const result = JSON.parse(localStorage.getItem("config"));
+      expect(result.format_version).toEqual("1.2");
+      expect(result.target_page).toEqual("https://httpbin.org/*");
+      expect(result.show_comments).toEqual(true);
+      expect(result.use_url_contains).toEqual(false);
+      expect(result.debug_mode).toEqual(false);
+      expect(result.headers[0].url_contains).toEqual("");
+      expect(result.headers[0].action).toEqual("add");
+      expect(result.headers[0].header_name).toEqual("test-header-name");
+      expect(result.headers[0].header_value).toEqual("test-header-value");
+      expect(result.headers[0].comment).toEqual("test");
+      expect(result.headers[0].apply_on).toEqual("req");
+      expect(result.headers[0].status).toEqual("on");
+    });
+
+    it("should load configuration on format 1.1  ", function() {
+      const config= '{"format_version":"1.1","target_page":"https://httpbin.org/*","headers":[{"action":"add","header_name":"test-header-name","header_value":"test-header-value","comment":"test","apply_on":"res","status":"on"}]}';
+
+      loadConfiguration(config);
+      const result = JSON.parse(localStorage.getItem("config"));
+      expect(result.format_version).toEqual("1.2");
+      expect(result.target_page).toEqual("https://httpbin.org/*");
+      expect(result.show_comments).toEqual(true);
+      expect(result.use_url_contains).toEqual(false);
+      expect(result.headers[0].url_contains).toEqual("");
+      expect(result.headers[0].action).toEqual("add");
+      expect(result.headers[0].header_name).toEqual("test-header-name");
+      expect(result.headers[0].header_value).toEqual("test-header-value");
+      expect(result.headers[0].comment).toEqual("test");
+      expect(result.headers[0].apply_on).toEqual("res");
+      expect(result.headers[0].status).toEqual("on");
+    });
+
+
+    it("should load configuration on format 1.2  ", function() {
+      const config= '{"format_version":"1.2","target_page":"https://httpbin.org/*","debug_mode":true,"headers":[{"url_contains":"test","action":"add","header_name":"test-header-name","header_value":"test-header-value","comment":"test","apply_on":"res","status":"on"}]}';
+
+      loadConfiguration(config);
+      const result = JSON.parse(localStorage.getItem("config"));
+      expect(result.format_version).toEqual("1.2");
+      expect(result.target_page).toEqual("https://httpbin.org/*");
+      expect(result.debug_mode).toEqual(true);
+      expect(result.headers[0].url_contains).toEqual("test");
+      expect(result.headers[0].action).toEqual("add");
+      expect(result.headers[0].header_name).toEqual("test-header-name");
+      expect(result.headers[0].header_value).toEqual("test-header-value");
+      expect(result.headers[0].comment).toEqual("test");
+      expect(result.headers[0].apply_on).toEqual("res");
+      expect(result.headers[0].status).toEqual("on");
+    });
+
+    it("should popup an alert if json is invalid ", function() {
+      const config= '{"formaversion":"1.2","target_pae":"https://httpbin.org/*","debu_mode":true,"header":[{"url_contains":"test","action":"add","header_name":"test-header-name","headevalue":"test-header-value","comment":"test","apply_on":"res","status":"on"}]}';
+      mockAlertMessage ="";
+      loadConfiguration(config);
+      expect(mockAlertMessage).toEqual("Invalid file format");
+    });
+
+    it("should popup an alert if data is not json", function() {
+      const config= 'nothing useful';
+      mockAlertMessage ="";
+      loadConfiguration(config);
+      expect(mockAlertMessage).toEqual("Invalid file format");
+    });
+
+  });
+
 
 
   describe("#function appendLine", function() {
