@@ -43,8 +43,12 @@ function  loadConfigurationFromLocalStorage() {
     // If config 1.0 (Simple Modify headers V1.2) , save to format 1.1
     if (config.format_version==="1.0") {
       config.format_version="1.2";
-      for (let line of config.headers) line.apply_on="req";
+      for (let line of config.headers) {
+        line.apply_on="req";
+        line.url_contains="";
+      }
       config.debug_mode=false;
+      config.use_url_contains=false;
       console.log("save new config"+JSON.stringify(config));
     }
     // If config 1.1 (Simple Modify headers V1.3 to version 1.5) , save to format 1.2	
@@ -64,14 +68,14 @@ function  loadConfigurationFromLocalStorage() {
       for (const to_modify of modifyTable) {
         headers.push({action:to_modify[0],url_contains:"",header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
       }
-      config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false};
+      config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false,use_url_contains:false};
     }
     //else no config exists, create a default one
     else {
       console.log("Load default config");
       let headers = [];
       headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
-      config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
+      config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false,use_url_contains:false};
     }
   }
   storeInBrowserStorage({config:JSON.stringify(config)});
