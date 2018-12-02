@@ -136,7 +136,7 @@ describe("Config", function() {
 
 
     it("should load configuration on format 1.2  ", function() {
-      const config= '{"format_version":"1.2","target_page":"https://httpbin.org/*","debug_mode":true,"headers":[{"url_contains":"test","action":"add","header_name":"test-header-name","header_value":"test-header-value","comment":"test","apply_on":"res","status":"on"}]}';
+      const config= '{"format_version":"1.2","target_page":"https://httpbin.org/*","debug_mode":true,"headers":[{"url_contains":"test","action":"add","header_name":"test-header-name","header_value":"test-header-value","comment":"test","apply_on":"res","status":"on"},{"url_contains":"test2","action":"add","header_name":"test-header-name2","header_value":"test-header-value2","comment":"test2","apply_on":"res","status":"on"}]}';
 
       loadConfiguration(config);
       const result = JSON.parse(localStorage.getItem("config"));
@@ -150,7 +150,31 @@ describe("Config", function() {
       expect(result.headers[0].comment).toEqual("test");
       expect(result.headers[0].apply_on).toEqual("res");
       expect(result.headers[0].status).toEqual("on");
+      expect(result.headers[1].header_name).toEqual("test-header-name2");
+      expect(result.headers[1].header_value).toEqual("test-header-value2");
     });
+
+
+    it("should load configuration on modify header format  ", function() {
+      const config= '[{"action":"Add","name":"test-header-name","value":"test-header-value","comment":"test","enabled":"true"},{"action":"Add","name":"test-header-name2","value":"test-header-value2","comment":"test","enabled":"true"}]';
+
+      loadConfiguration(config);
+      const result = JSON.parse(localStorage.getItem("config"));
+      expect(result.format_version).toEqual("1.2");
+      expect(result.target_page).toEqual("");
+      expect(result.debug_mode).toEqual(false);
+      expect(result.headers[0].url_contains).toEqual("");
+      expect(result.headers[0].action).toEqual("add");
+      expect(result.headers[0].header_name).toEqual("test-header-name");
+      expect(result.headers[0].header_value).toEqual("test-header-value");
+      expect(result.headers[0].comment).toEqual("test");
+      expect(result.headers[0].apply_on).toEqual("req");
+      expect(result.headers[0].status).toEqual("on");
+      expect(result.headers[1].header_name).toEqual("test-header-name2");
+    });
+
+
+
 
     it("should popup an alert if json is invalid ", function() {
       const config= '{"formaversion":"1.2","target_pae":"https://httpbin.org/*","debu_mode":true,"header":[{"url_contains":"test","action":"add","header_name":"test-header-name","headevalue":"test-header-value","comment":"test","apply_on":"res","status":"on"}]}';

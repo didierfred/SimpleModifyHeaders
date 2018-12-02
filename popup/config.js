@@ -1,62 +1,22 @@
- 	
-
-/* This Source Code Form is subject to the terms of the Mozilla Public
+ /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
  * @author didierfred@gmail.com
- * @version 0.5
  */
-
 
 let line_number;
 let started;
 let show_comments;
 let use_url_contains;
-let url_contains_field_size;
-let header_name_field_size;
-let header_value_field_size;
-let comments_field_size;
 let input_field_style;
-
 
 
 window.onload = function() {
    initConfigurationPage();
  }
 
-
-function loadFromBrowserStorage(item,callback_function) { 
-  chrome.storage.local.get(item, callback_function);
-}
-
-function storeInBrowserStorage(item,callback_function)  {
-  chrome.storage.local.set(item,callback_function);
-}
-
-
-
-function log(message) {
-  console.log(new Date() + " SimpleModifyHeader : " + message);
-}
-
-
-function initGlobalValue()
- {
-  line_number = 1;
-  started = "off";
-  show_comments = true;
-  use_url_contains = false;
-  url_contains_field_size= 18;
-  header_name_field_size= 20;
-  header_value_field_size= 28;
-  comments_field_size= 28;
-  input_field_style="form_control input_field_small"
- }
-
-
 function initConfigurationPage() {
-
 	initGlobalValue();
 	// load configuration from local storage
         loadFromBrowserStorage(['config'],function (result) {
@@ -66,12 +26,12 @@ function initConfigurationPage() {
 	  if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;
 	  else if (config.show_comments) document.getElementById("show_comments").checked = true;
 	  else show_comments=false;
- 
+
 	  if (config.use_url_contains) {
             document.getElementById("use_url_contains").checked = true;
             use_url_contains=true;
           }
-		
+
 	  for (let to_add of config.headers) appendLine(to_add.url_contains,to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
 	  document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
 	  document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
@@ -83,19 +43,39 @@ function initConfigurationPage() {
 	  checkTargetPageField();
 	  document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
 	  document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
-	  
+
           loadFromBrowserStorage(['started'], function (result) {
 	    started = result.started;
 	    if (started==="on") document.getElementById("start_img").src = "img/stop.png";
           });
-	
+
 	  document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
 	  document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
 	  reshapeTable();
         });
+}
 
-} 
+function initGlobalValue()
+ {
+  line_number = 1;
+  started = "off";
+  show_comments = true;
+  use_url_contains = false;
+  input_field_style="form_control input_field_small";
+ }
 
+
+function loadFromBrowserStorage(item,callback_function) {
+  chrome.storage.local.get(item, callback_function);
+}
+
+function storeInBrowserStorage(item,callback_function)  {
+  chrome.storage.local.set(item,callback_function);
+}
+
+function log(message) {
+  console.log(new Date() + " SimpleModifyHeader : " + message);
+}
 
 /** PARAMETERS SCREEN MANAGEMENT **/
 
@@ -132,7 +112,7 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
   let html = "<td";
   if (!use_url_contains) html=html+" hidden";
   html = html + "><input class=\""+ input_field_style+ "\" id=\"url_contains"+ line_number + "\"></input></td>";
-  html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number 
+  html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number
 			   + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
   html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_name"+ line_number + "\"></input></td>";
   html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_value"+ line_number + "\"></input></td>";
@@ -141,11 +121,11 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
   html = html + "><input class=\""+ input_field_style + "\" id=\"comment"+ line_number + "\"></input></td>";
   html = html + "<td><select class=\"form_control select_field\" id=\"apply_on"
 			  + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
-  html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button" 
+  html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button"
 			  + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
   html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button"
 			  + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>";
-  html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button" 
+  html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button"
 		      + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>";
   html = html +  "<td><a href=\"#\" title=\"Delete line\" id=\"delete_button"
 			  + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>";
@@ -171,7 +151,7 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
 }
 
 
-/** ACTIVATE BUTTON MANAGEMENT **/ 
+/** ACTIVATE BUTTON MANAGEMENT **/
 
 function setButtonStatus(button,status) {
   if (status==="on") {
@@ -189,7 +169,6 @@ function getButtonStatus(button) {
   return "off";
 }
 
-
 function switchActivateButton(button_number) {
   const activate_button = document.getElementById("activate_button"+button_number);
   // Button is ON
@@ -198,10 +177,8 @@ function switchActivateButton(button_number) {
   else setButtonStatus(activate_button,"on");
 }
 
-/** END ACTIVATE BUTTON MANAGEMENT **/ 
+/** END ACTIVATE BUTTON MANAGEMENT **/
 
-
-/** Reshape the table  **/
 
 function reshapeTable() {
   let th_elements = document.querySelectorAll("#config_table_head th");
@@ -216,8 +193,7 @@ function reshapeTable() {
     else input_field_style = "form_control input_field_large";
   }
 
-
-  for (let i=0;i<tr_elements.length;i++) { 
+  for (let i=0;i<tr_elements.length;i++) {
     tr_elements[i].childNodes[4].childNodes[0].className=input_field_style;
     tr_elements[i].childNodes[4].hidden = (!show_comments);
     tr_elements[i].childNodes[3].childNodes[0].className=input_field_style;
@@ -229,10 +205,8 @@ function reshapeTable() {
   th_elements[0].hidden = (!use_url_contains);
 }
 
-
-
 /**
-* Create a JSON String representing the configuration data 
+* Create a JSON String representing the configuration data
 *
 **/
 function create_configuration_data() {
@@ -251,7 +225,7 @@ function create_configuration_data() {
     headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
   }
   if (document.getElementById("debug_mode").checked) debug_mode=true;
-  if (document.getElementById("show_comments").checked) show_comments=true;	
+  if (document.getElementById("show_comments").checked) show_comments=true;
   if (document.getElementById("use_url_contains").checked) use_url_contains=true;
   let to_export = {format_version:"1.2",target_page:document.getElementById('targetPage').value,headers:headers,
 				  debug_mode:debug_mode,show_comments:show_comments,use_url_contains:use_url_contains};
@@ -284,8 +258,6 @@ function isTargetValid(target) {
 *  save the data to the local storage and restart modify header
 * show a warning if url patterns are invalid
 **/
-
-
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
   storeInBrowserStorage({config:create_configuration_data()},function() {
@@ -295,14 +267,12 @@ function saveData() {
 }
 
 /**
-* If url pattern is valid save the data in a file 
+* If url pattern is valid save the data in a file
 **/
-
 function exportData() {
-
   // Create file data
   let to_export= create_configuration_data();
-	
+
   // Create file to save
   let a         = document.createElement('a');
   a.href        = 'data:attachment/json,' +  encodeURIComponent(to_export);
@@ -315,7 +285,6 @@ function exportData() {
   myf.body.appendChild(a);
   a.click();
 }
-	
 
 /**
 * Choose a file and import data from the choosen file
@@ -337,22 +306,21 @@ function importData(evt) {
 /**
 * Import configuration from a file
 *
-* 
+*
 *
 **/
-
 function readSingleFile(e) {
   let file = e.target.files[0];
   if (!file) return;
   let reader = new FileReader();
-  reader.onload = function(e) { 
+  reader.onload = function(e) {
     loadConfiguration(e.target.result);
   }
   reader.readAsText(file);
 }
 
 /**
-* Load configuration from a string 
+* Load configuration from a string
 * If format is not recognized , try modify header add-an file format
 **/
 function loadConfiguration(configuration) {
@@ -361,22 +329,11 @@ function loadConfiguration(configuration) {
     config = JSON.parse(configuration);
     // check file format
     if (config.format_version) {
-      if (config.format_version==="1.0") config = convertConfigurationFormat1dot0ToCurrentFormat(config); 
+      if (config.format_version==="1.0") config = convertConfigurationFormat1dot0ToCurrentFormat(config);
       else if (config.format_version==="1.1") config = convertConfigurationFormat1dot1ToCurrentFormat(config);
     }
     else {
-      // try modify header add-on file format  : array of {action,name,value,comment,enabled}
-      if (config[0].action) {
-	let headers = [];
-	for (let line_to_load of config) {
-          var enabled = "off";
-          if (line_to_load.enabled) enabled = "on";
-	  if (line_to_load.action==="Filter") line_to_load.action="delete";			   
-	  headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,
-					header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
-	}
-	config = {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
-      }
+      if (config[0].action) config = convertHistoricalModifyHeaderFormatToCurrentFormat (config);
       else {
         alert("Invalid file format");
 	return;
@@ -391,11 +348,9 @@ function loadConfiguration(configuration) {
 
   // store the conf in the local storage
   storeInBrowserStorage({config:JSON.stringify(config)},function() {
-   // load the new conf 
+   // load the new conf
    reloadConfigPage();
   });
-  
- 
 }
 
 function convertConfigurationFormat1dot0ToCurrentFormat(config) {
@@ -419,15 +374,28 @@ function convertConfigurationFormat1dot1ToCurrentFormat(config) {
   return config;
  }
 
+/**
+* Historical Modify header add-on file format  : array of {action,name,value,comment,enabled}
+**/
+function convertHistoricalModifyHeaderFormatToCurrentFormat(config) {
+  let headers = [];
+  for (let line_to_load of config) {
+    var enabled = "off";
+    if (line_to_load.enabled) enabled = "on";
+    if (line_to_load.action==="Filter") line_to_load.action="delete";		        
+    headers.push({url_contains:"",action:line_to_load.action.toLowerCase(),header_name:line_to_load.name,
+					header_value:line_to_load.value,comment:line_to_load.comment,apply_on:"req",status:enabled});
+  }
+  return {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
+}
 
 function reloadConfigPage() {
   chrome.runtime.sendMessage("reload");
   document.location.href="config.html";
   }
 
-
 /**
-* Delete a configuration line on the UI 
+* Delete a configuration line on the UI
 **/
 function deleteLine(line_number_to_delete) {
   if (line_number_to_delete !== line_number) {
@@ -448,12 +416,9 @@ function deleteLine(line_number_to_delete) {
   line_number--;
 }
 
-
 /**
 * Invert two configuration lines on the UI
 **/
-
-
 function invertLine(line1, line2) {
   // if a line does not exist , do nothing
   if ((line1===0)||(line2===0)||(line1>=line_number)||(line2>=line_number)) return;
@@ -476,7 +441,7 @@ function invertLine(line1, line2) {
   setButtonStatus(document.getElementById("activate_button"+line1),getButtonStatus(document.getElementById("activate_button"+line2)));
   document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
 
-  // Copy line 1 to line 2 
+  // Copy line 1 to line 2
   document.getElementById("select_action"+line2).value = select_action1;
   document.getElementById("url_contains"+line2).value = url_contains1;
   document.getElementById("header_name"+line2).value = header_name1;
@@ -495,7 +460,7 @@ function startModify() {
       storeInBrowserStorage({started:'on'},function() {
         chrome.runtime.sendMessage("on");
         started = "on";
-        document.getElementById("start_img").src = "img/stop.png";	
+        document.getElementById("start_img").src = "img/stop.png";
       });
   }
   else {
