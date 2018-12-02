@@ -11,71 +11,84 @@
 "use strict";
 
 let config;
-let started = "off";
+let started = 'off';
 let debug_mode = false;
 
+loadFromBrowserStorage(['config','started'],function(result) {
+  config = result.config;
+ 
+ // if old storage method
+  if (config===undefined)  loadConfigurationFromLocalStorage();
+  else started = result.started;
 
-
-// if configuration exist 
-if (localStorage.getItem('config')) {
-  console.log("Load standard config");
-  config= JSON.parse(localStorage.getItem('config'));
-  
- // If config 1.0 (Simple Modify headers V1.2) , save to format 1.1
-  if (config.format_version==="1.0") {
-    config.format_version="1.1";
-    for (let line of config.headers) line.apply_on="req";
-    config.debug_mode=false;
-    console.log("save new config"+JSON.stringify(config));
-    localStorage.setItem("config",JSON.stringify(config));
+  if (started==='on') {
+    addListener();
+    chrome.browserAction.setIcon({ path: 'icons/modify-green-32.png'});
   }
-
- // If config 1.1 (Simple Modify headers V1.3 to version 1.5) , save to format 1.2	
-  if (config.format_version==="1.1") {
-    config.format_version="1.2";
-    for (let line of config.headers) line.url_contains="";
-    config.use_url_contains=false;
-    console.log("save new config"+JSON.stringify(config));
-    localStorage.setItem("config",JSON.stringify(config));
+  else if (started !== 'off') { 
+    started = 'off';
+    storeInBrowserStorage({started:'off'});    
   }
-}
-else {
-  // else check if old config exist (Simple Modify headers V1.1)
-  if (localStorage.getItem('targetPage')&& localStorage.getItem('modifyTable')) {
-    console.log("Load old config");
-    let headers = [];
-    let modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
-    for (const to_modify of modifyTable) {
-      headers.push({action:to_modify[0],url_contains:"",header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
+  // listen for change in configuration or start/stop
+  chrome.runtime.onMessage.addListener(notify);
+});
+
+
+function  loadConfigurationFromLocalStorage() {
+  // if configuration exist 
+  if (localStorage.getItem('config')) {
+    console.log("Load standard config");
+    config= JSON.parse(localStorage.getItem('config'));
+ 
+    // If config 1.0 (Simple Modify headers V1.2) , save to format 1.1
+    if (config.format_version==="1.0") {
+      config.format_version="1.2";
+      for (let line of config.headers) line.apply_on="req";
+      config.debug_mode=false;
+      console.log("save new config"+JSON.stringify(config));
     }
-    config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false};
-    // save old config in new format
-    localStorage.setItem("config",JSON.stringify(config));
+    // If config 1.1 (Simple Modify headers V1.3 to version 1.5) , save to format 1.2	
+    if (config.format_version==="1.1") {
+      config.format_version="1.2";
+      for (let line of config.headers) line.url_contains="";
+      config.use_url_contains=false;
+      console.log("save new config"+JSON.stringify(config));
+    }
   }
-  //else no config exists, create a default one
   else {
-    console.log("Load default config");
-    let headers = [];
-    headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
-    config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
-    // save configuration
-    localStorage.setItem("config",JSON.stringify(config));
+    // else check if old config exist (Simple Modify headers V1.1)
+    if (localStorage.getItem('targetPage')&& localStorage.getItem('modifyTable')) {
+      console.log("Load old config");
+      let headers = [];
+      let modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
+      for (const to_modify of modifyTable) {
+        headers.push({action:to_modify[0],url_contains:"",header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
+      }
+      config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false};
+    }
+    //else no config exists, create a default one
+    else {
+      console.log("Load default config");
+      let headers = [];
+      headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
+      config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false};
+    }
   }
+  storeInBrowserStorage({config:JSON.stringify(config)});
+  started=localStorage.getItem('started');
+  if (started!==undefined) storeInBrowserStorage({started:started});
+}	
+
+
+
+
+function loadFromBrowserStorage(item,callback_function) { 
+  chrome.storage.local.get(item, callback_function);
 }
-		
-		
-// If no started value stored , use a default one
-if (!localStorage.getItem('started')) localStorage.setItem('started',started);
-else started = localStorage.getItem('started');
 
-
-if (started==="on") {
-  addListener();
-  chrome.browserAction.setIcon({ path: "icons/modify-green-32.png"});
+function storeInBrowserStorage(item,callback_function)  {
+  chrome.storage.local.set(item,callback_function);
 }
-
-// listen for change in configuration or start/stop
-chrome.runtime.onMessage.addListener(notify);
 
 
 /*
@@ -180,11 +193,13 @@ function rewriteResponseHeader(e) {
 function notify(message) {
   if (message==="reload") {
     if (config.debug_mode) log("Reload configuration");
-    config=JSON.parse(localStorage.getItem("config"));
-    if (started==="on") {
-      removeListener();
-      addListener();
-    }
+    loadFromBrowserStorage(['config'],function (result) {
+      config=JSON.parse(result.config);
+      if (started==="on") {
+        removeListener();
+        addListener();
+      }
+    });
   }
   else if (message==="off") {
     removeListener();

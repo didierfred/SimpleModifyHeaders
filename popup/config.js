@@ -26,6 +26,21 @@ window.onload = function() {
  }
 
 
+function loadFromBrowserStorage(item,callback_function) { 
+  chrome.storage.local.get(item, callback_function);
+}
+
+function storeInBrowserStorage(item,callback_function)  {
+  chrome.storage.local.set(item,callback_function);
+}
+
+
+
+function log(message) {
+  console.log(new Date() + " SimpleModifyHeader : " + message);
+}
+
+
 function initGlobalValue()
  {
   line_number = 1;
@@ -44,36 +59,41 @@ function initConfigurationPage() {
 
 	initGlobalValue();
 	// load configuration from local storage
-	let config = JSON.parse(localStorage.getItem("config"));
-	if (config.debug_mode) document.getElementById("debug_mode").checked = true;
+        loadFromBrowserStorage(['config'],function (result) {
+	  config = JSON.parse(result.config);
+	  if (config.debug_mode) document.getElementById("debug_mode").checked = true;
 
-	if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;
-	else if (config.show_comments) document.getElementById("show_comments").checked = true;
-	else show_comments=false;
-
-	if (config.use_url_contains) {
-          document.getElementById("use_url_contains").checked = true;
-          use_url_contains=true;
-        }
+	  if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;
+	  else if (config.show_comments) document.getElementById("show_comments").checked = true;
+	  else show_comments=false;
+ 
+	  if (config.use_url_contains) {
+            document.getElementById("use_url_contains").checked = true;
+            use_url_contains=true;
+          }
 		
-	for (let to_add of config.headers) appendLine(to_add.url_contains,to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
-	document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
-	document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
-	document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
-	document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
-	document.getElementById('add_button').addEventListener('click',function (e) {appendLine("","add","-","-","","req","on");});
-	document.getElementById('start_img').addEventListener('click',function (e) {startModify();});
-	document.getElementById('targetPage').value=config.target_page;
-	checkTargetPageField();
-	document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
-	document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
+	  for (let to_add of config.headers) appendLine(to_add.url_contains,to_add.action,to_add.header_name,to_add.header_value,to_add.comment,to_add.apply_on,to_add.status);
+	  document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
+	  document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
+	  document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
+	  document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
+	  document.getElementById('add_button').addEventListener('click',function (e) {appendLine("","add","-","-","","req","on");});
+	  document.getElementById('start_img').addEventListener('click',function (e) {startModify();});
+	  document.getElementById('targetPage').value=config.target_page;
+	  checkTargetPageField();
+	  document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
+	  document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
+	  
+          loadFromBrowserStorage(['started'], function (result) {
+	    started = result.started;
+	    if (started==="on") document.getElementById("start_img").src = "img/stop.png";
+          });
 	
-	started = localStorage.getItem("started");
-	if (started==="on") document.getElementById("start_img").src = "img/stop.png";
-	
-	document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
-	document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
-	reshapeTable();
+	  document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
+	  document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
+	  reshapeTable();
+        });
+
 } 
 
 
@@ -268,8 +288,9 @@ function isTargetValid(target) {
 
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
-  localStorage.setItem("config",create_configuration_data());
-  chrome.runtime.sendMessage("reload");
+  storeInBrowserStorage({config:create_configuration_data()},function() {
+    chrome.runtime.sendMessage("reload");
+  });
   return true;
 }
 
@@ -369,10 +390,12 @@ function loadConfiguration(configuration) {
   }
 
   // store the conf in the local storage
-  localStorage.setItem("config",JSON.stringify(config));
+  storeInBrowserStorage({config:JSON.stringify(config)},function() {
+   // load the new conf 
+   reloadConfigPage();
+  });
   
- // load the new conf 
-  reloadConfigPage();
+ 
 }
 
 function convertConfigurationFormat1dot0ToCurrentFormat(config) {
@@ -469,15 +492,17 @@ function invertLine(line1, line2) {
 function startModify() {
   if (started==="off") {
       saveData();
-      localStorage.setItem("started","on");
-      chrome.runtime.sendMessage("on");
-      started = "on";
-      document.getElementById("start_img").src = "img/stop.png";	
+      storeInBrowserStorage({started:'on'},function() {
+        chrome.runtime.sendMessage("on");
+        started = "on";
+        document.getElementById("start_img").src = "img/stop.png";	
+      });
   }
   else {
-    localStorage.setItem("started","off");
-    chrome.runtime.sendMessage("off");
-    started = "off";
-    document.getElementById("start_img").src = "img/start.png";
+    storeInBrowserStorage({started:'off'},function() {
+      chrome.runtime.sendMessage("off");
+      started = "off";
+      document.getElementById("start_img").src = "img/start.png";
+    });
   }
 }

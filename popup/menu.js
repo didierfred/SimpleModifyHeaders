@@ -11,35 +11,53 @@
 
 var started = "off";
 
+
+
+
 window.onload = function() {
 	document.getElementById('config').addEventListener('click',function (e) {start_config();});
 	document.getElementById('start_stop').addEventListener('click',function (e) {start_modify();});
-	started = localStorage.getItem("started");
-	if (started==="on") document.getElementById("start_stop").value = "Stop";
+	loadFromBrowserStorage(['started'],function(result) {
+          started =result.started;
+	  if (started==="on") document.getElementById("start_stop").value = "Stop";
+        });
 }
 
 
-function start_modify()
-	{
-	if (started==="off")
-		{
-		localStorage.setItem("started","on");
-		chrome.runtime.sendMessage("on");
-		started = "on";
-		document.getElementById("start_stop").value = "Stop";
-		}
-	else 
-		{
-		localStorage.setItem("started","off");
-		chrome.runtime.sendMessage("off");
-		started = "off";
-		document.getElementById("start_stop").value = "Start";
-		}
+function loadFromBrowserStorage(item,callback_function) { 
+  chrome.storage.local.get(item, callback_function);
+}
 
-	// if exists reload config tab , to get the start/stop information correct
-      chrome.tabs.query({currentWindow: true},reloadConfigTab);
-	
+function storeInBrowserStorage(item,callback_function)  {
+  chrome.storage.local.set(item,callback_function);
+}
+
+
+
+
+
+function start_modify() {
+	if (started==="off") {
+		storeInBrowserStorage({started:'on'},function() {
+ 		  chrome.runtime.sendMessage("on");
+		  started = "on";
+		  document.getElementById("start_stop").value = "Stop";
+	          // if exists reload config tab , to get the start/stop information correct
+                  chrome.tabs.query({currentWindow: true},reloadConfigTab);
+                });
 	}
+	else {
+		storeInBrowserStorage({started:'off'},function() {
+		  chrome.runtime.sendMessage("off");
+		  started = "off";
+		  document.getElementById("start_stop").value = "Start";
+	          // if exists reload config tab , to get the start/stop information correct
+                  chrome.tabs.query({currentWindow: true},reloadConfigTab);
+  		});
+	}
+
+
+}
 	
 	
 function reloadConfigTab(tabs)

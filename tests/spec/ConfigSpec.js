@@ -1,3 +1,21 @@
+
+// Mock the Storage as the chrome.storage is not available outside of webextension
+function loadFromBrowserStorage(item,callback_function) { 
+  var result = new Object;
+  Object.defineProperty(result, item, {
+  value: localStorage.getItem(item[0]),
+  writable: true
+});
+  callback_function.call(this,result);
+}
+
+function storeInBrowserStorage(item,callback_function)  { 
+  localStorage.setItem(Object.entries(item)[0][0],Object.entries(item)[0][1]);
+  callback_function.call();
+}
+
+
+
 describe("Config", function() {
   
   function cleanConfigTableForTest() {
@@ -41,6 +59,7 @@ describe("Config", function() {
     });
   });
 
+
   describe("#function create_configuration_data", function() {
  
     beforeEach(function() {
@@ -68,7 +87,6 @@ describe("Config", function() {
      cleanConfigTableForTest();
     });
   });
-
 
   describe("#function loadConfiguration", function() {
 
@@ -422,4 +440,5 @@ describe("#function invertLine", function() {
         expect(document.getElementById('targetPage').style.color).toEqual("red");
     });
   });
+
 });
