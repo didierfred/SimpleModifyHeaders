@@ -3,7 +3,7 @@
   "description": "Simple Modify headers ",
   "manifest_version": 2,
   "name": "simple-modify-headers",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "homepage_url": "https://github.com/didierfred/SimpleModifyHeaders",
   "icons": {
     "48": "icons/modify-48.png"
@@ -21,6 +21,12 @@
     "default_icon": "icons/modify-32.png",
     "default_title": "Simple Modify Headers",
     "default_popup": "popup/menu.html"
+  },
+  
+  "applications": {
+  "gecko": {
+    "id": "{f6ca2dfb-43a6-4334-9fad-8d5a71a1fe67}",
+    "strict_min_version": "42.0"
+     }
   }
-
 }

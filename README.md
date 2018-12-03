@@ -35,10 +35,8 @@ The parameters button permits to :
 - Filter URL per rules : activate the possiblity to filter url for each rules on the config panel, the header field will be modify only if the url contains the configurated value.
 
 
-## Firefox specific issues 
-- The rules are active in private window mode but you can't use the configuration window in this mode.
-- If  you check "never remember history" in firefox settings, the configuration will be lost when firefox exit.
-- According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exist, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add"
+## Firefox specific issue
+According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exist, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add"
   
 
 ## License
