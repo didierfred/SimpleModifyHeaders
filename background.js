@@ -15,11 +15,13 @@ let started = 'off';
 let debug_mode = false;
 
 loadFromBrowserStorage(['config','started'],function(result) {
-  config = result.config;
- 
- // if old storage method
-  if (config===undefined)  loadConfigurationFromLocalStorage();
-  else started = result.started;
+
+  // if old storage method
+  if (result.config===undefined)  loadConfigurationFromLocalStorage();
+  else { 
+    started = result.started;
+    config = JSON.parse(result.config); 
+    }
 
   if (started==='on') {
     addListener();
