@@ -2,6 +2,8 @@
 
 Extension for firefox and chrome. 
 
+The extension can be install via [this link](https://addons.mozilla.org/fr/firefox/addon/simple-modify-header/) for firefox and via [this link](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic) for chrome
+
 The extension rewrite the headers based on a rules table. 
 
 The extension can be start and stop via the button on the top right.
