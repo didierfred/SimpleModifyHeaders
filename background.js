@@ -13,6 +13,7 @@
 let config;
 let started = 'off';
 let debug_mode = false;
+const isChrome = (navigator.userAgent.indexOf("chrome")!==-1);
 
 loadFromBrowserStorage(['config','started'],function(result) {
 
@@ -229,13 +230,29 @@ function notify(message) {
 function addListener() {
   let target = config.target_page;
   if ((target==="*")||(target==="")||(target===" ")) target="<all_urls>";
-  chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
+  
+  // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest
+  if (isChrome)
+  {
+	chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
+                                          {urls: target.split(";")},
+                                          ["blocking", "requestHeaders","extraHeaders"]);
+
+	chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
+                                          {urls: target.split(";")},
+                                          ["blocking", "responseHeaders","extraHeaders"]);
+  }
+  
+  else
+  {
+	  chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
                                           {urls: target.split(";")},
                                           ["blocking", "requestHeaders"]);
-
-  chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
+	  chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
                                           {urls: target.split(";")},
                                           ["blocking", "responseHeaders"]);
+  }
+  
 }
 
 
