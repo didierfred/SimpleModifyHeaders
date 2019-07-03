@@ -1,32 +1,34 @@
 {
-
   "description": "Simple Modify headers ",
   "manifest_version": 2,
   "name": "simple-modify-headers",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "homepage_url": "https://github.com/didierfred/SimpleModifyHeaders",
   "icons": {
     "48": "icons/modify-48.png"
   },
-
   "permissions": [
-    "activeTab","storage","webRequest", "webRequestBlocking", "<all_urls>" ,"tabs"
+    "activeTab",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "tabs"
   ],
-  
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
-
   "browser_action": {
     "default_icon": "icons/modify-32.png",
     "default_title": "Simple Modify Headers",
     "default_popup": "popup/menu.html"
   },
-  
   "applications": {
-  "gecko": {
-    "id": "{f6ca2dfb-43a6-4334-9fad-8d5a71a1fe67}",
-    "strict_min_version": "42.0"
-     }
+    "gecko": {
+      "id": "{f6ca2dfb-43a6-4334-9fad-8d5a71a1fe67}",
+      "strict_min_version": "42.0"
+    }
   }
 }
