@@ -13,7 +13,7 @@
 let config;
 let started = 'off';
 let debug_mode = false;
-const isChrome = (navigator.userAgent.indexOf("chrome") !== -1);
+const isChrome = (navigator.userAgent.toLowerCase().indexOf("chrome") !== -1);
 
 loadFromBrowserStorage(['config', 'started'], function (result) {
 
@@ -231,7 +231,7 @@ function addListener() {
   let target = config.target_page;
   if ((target === "*") || (target === "") || (target === " ")) target = "<all_urls>";
 
-  // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest
+  // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest#life_cycle_footnote
   if (isChrome) {
     chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
       { urls: target.split(";") },
