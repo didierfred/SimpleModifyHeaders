@@ -13,88 +13,88 @@
 let config;
 let started = 'off';
 let debug_mode = false;
-const isChrome = (navigator.userAgent.indexOf("chrome")!==-1);
+const isChrome = (navigator.userAgent.indexOf("chrome") !== -1);
 
-loadFromBrowserStorage(['config','started'],function(result) {
+loadFromBrowserStorage(['config', 'started'], function (result) {
 
   // if old storage method
-  if (result.config===undefined)  loadConfigurationFromLocalStorage();
-  else { 
+  if (result.config === undefined) loadConfigurationFromLocalStorage();
+  else {
     started = result.started;
-    config = JSON.parse(result.config); 
-    }
-
-  if (started==='on') {
-    addListener();
-    chrome.browserAction.setIcon({ path: 'icons/modify-green-32.png'});
+    config = JSON.parse(result.config);
   }
-  else if (started !== 'off') { 
+
+  if (started === 'on') {
+    addListener();
+    chrome.browserAction.setIcon({ path: 'icons/modify-green-32.png' });
+  }
+  else if (started !== 'off') {
     started = 'off';
-    storeInBrowserStorage({started:'off'});    
+    storeInBrowserStorage({ started: 'off' });
   }
   // listen for change in configuration or start/stop
   chrome.runtime.onMessage.addListener(notify);
 });
 
 
-function  loadConfigurationFromLocalStorage() {
+function loadConfigurationFromLocalStorage() {
   // if configuration exist 
   if (localStorage.getItem('config')) {
     console.log("Load standard config");
-    config= JSON.parse(localStorage.getItem('config'));
- 
+    config = JSON.parse(localStorage.getItem('config'));
+
     // If config 1.0 (Simple Modify headers V1.2) , save to format 1.1
-    if (config.format_version==="1.0") {
-      config.format_version="1.2";
+    if (config.format_version === "1.0") {
+      config.format_version = "1.2";
       for (let line of config.headers) {
-        line.apply_on="req";
-        line.url_contains="";
+        line.apply_on = "req";
+        line.url_contains = "";
       }
-      config.debug_mode=false;
-      config.use_url_contains=false;
-      console.log("save new config"+JSON.stringify(config));
+      config.debug_mode = false;
+      config.use_url_contains = false;
+      console.log("save new config" + JSON.stringify(config));
     }
     // If config 1.1 (Simple Modify headers V1.3 to version 1.5) , save to format 1.2	
-    if (config.format_version==="1.1") {
-      config.format_version="1.2";
-      for (let line of config.headers) line.url_contains="";
-      config.use_url_contains=false;
-      console.log("save new config"+JSON.stringify(config));
+    if (config.format_version === "1.1") {
+      config.format_version = "1.2";
+      for (let line of config.headers) line.url_contains = "";
+      config.use_url_contains = false;
+      console.log("save new config" + JSON.stringify(config));
     }
   }
   else {
     // else check if old config exist (Simple Modify headers V1.1)
-    if (localStorage.getItem('targetPage')&& localStorage.getItem('modifyTable')) {
+    if (localStorage.getItem('targetPage') && localStorage.getItem('modifyTable')) {
       console.log("Load old config");
       let headers = [];
-      let modifyTable=JSON.parse(localStorage.getItem("modifyTable"));
+      let modifyTable = JSON.parse(localStorage.getItem("modifyTable"));
       for (const to_modify of modifyTable) {
-        headers.push({action:to_modify[0],url_contains:"",header_name:to_modify[1],header_value:to_modify[2],comment:"",apply_on:"req",status:to_modify[3]});
+        headers.push({ action: to_modify[0], url_contains: "", header_name: to_modify[1], header_value: to_modify[2], comment: "", apply_on: "req", status: to_modify[3] });
       }
-      config = {format_version:"1.1",target_page:localStorage.getItem('targetPage'),headers:headers,debug_mode:false,use_url_contains:false};
+      config = { format_version: "1.1", target_page: localStorage.getItem('targetPage'), headers: headers, debug_mode: false, use_url_contains: false };
     }
     //else no config exists, create a default one
     else {
       console.log("Load default config");
       let headers = [];
-      headers.push({url_contains:"",action:"add",header_name:"test-header-name",header_value:"test-header-value",comment:"test",apply_on:"req",status:"on"});
-      config = {format_version:"1.1",target_page:"https://httpbin.org/*",headers:headers,debug_mode:false,use_url_contains:false};
+      headers.push({ url_contains: "", action: "add", header_name: "test-header-name", header_value: "test-header-value", comment: "test", apply_on: "req", status: "on" });
+      config = { format_version: "1.1", target_page: "https://httpbin.org/*", headers: headers, debug_mode: false, use_url_contains: false };
     }
   }
-  storeInBrowserStorage({config:JSON.stringify(config)});
-  started=localStorage.getItem('started');
-  if (started!==undefined) storeInBrowserStorage({started:started});
-}	
+  storeInBrowserStorage({ config: JSON.stringify(config) });
+  started = localStorage.getItem('started');
+  if (started !== undefined) storeInBrowserStorage({ started: started });
+}
 
 
 
 
-function loadFromBrowserStorage(item,callback_function) { 
+function loadFromBrowserStorage(item, callback_function) {
   chrome.storage.local.get(item, callback_function);
 }
 
-function storeInBrowserStorage(item,callback_function)  {
-  chrome.storage.local.set(item,callback_function);
+function storeInBrowserStorage(item, callback_function) {
+  chrome.storage.local.set(item, callback_function);
 }
 
 
@@ -114,38 +114,38 @@ function log(message) {
 function rewriteRequestHeader(e) {
   if (config.debug_mode) log("Start modify request headers for url " + e.url);
   for (let to_modify of config.headers) {
-    if ((to_modify.status==="on")&&(to_modify.apply_on==="req")&& (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains)))) {
-      if (to_modify.action==="add"){
-        let new_header = {"name" :to_modify.header_name,"value":to_modify.header_value};
+    if ((to_modify.status === "on") && (to_modify.apply_on === "req") && (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains)))) {
+      if (to_modify.action === "add") {
+        let new_header = { "name": to_modify.header_name, "value": to_modify.header_value };
         e.requestHeaders.push(new_header);
-		if (config.debug_mode) log("Add request header : name=" + to_modify.header_name +
-		  ",value=" + to_modify.header_value + " for url " + e.url);
+        if (config.debug_mode) log("Add request header : name=" + to_modify.header_name +
+          ",value=" + to_modify.header_value + " for url " + e.url);
       }
-      else if (to_modify.action==="modify") {
-	for (let header of e.requestHeaders) {
+      else if (to_modify.action === "modify") {
+        for (let header of e.requestHeaders) {
           if (header.name.toLowerCase() === to_modify.header_name.toLowerCase()) {
             if (config.debug_mode) log("Modify request header :  name= " + to_modify.header_name +
-			  ",old value=" + header.value +  ",new value=" + to_modify.header_value +
-			  " for url " + e.url);
+              ",old value=" + header.value + ",new value=" + to_modify.header_value +
+              " for url " + e.url);
             header.value = to_modify.header_value;
           }
         }
       }
-      else if (to_modify.action==="delete") {
+      else if (to_modify.action === "delete") {
         let index = -1;
-        for (let i=0; i < e.requestHeaders.length; i++) {
-          if (e.requestHeaders[i].name.toLowerCase() === to_modify.header_name.toLowerCase())  index=i;
+        for (let i = 0; i < e.requestHeaders.length; i++) {
+          if (e.requestHeaders[i].name.toLowerCase() === to_modify.header_name.toLowerCase()) index = i;
         }
-	if (index!==-1) {
-          e.requestHeaders.splice(index,1);
+        if (index !== -1) {
+          e.requestHeaders.splice(index, 1);
           if (config.debug_mode) log("Delete request header :  name=" + to_modify.header_name.toLowerCase() +
-		    " for url " + e.url);
+            " for url " + e.url);
         }
       }
     }
   }
   if (config.debug_mode) log("End modify request headers for url " + e.url);
-  return {requestHeaders: e.requestHeaders};
+  return { requestHeaders: e.requestHeaders };
 }
 
 
@@ -156,37 +156,37 @@ function rewriteRequestHeader(e) {
 function rewriteResponseHeader(e) {
   if (config.debug_mode) log("Start modify response headers for url " + e.url);
   for (let to_modify of config.headers) {
-    if ((to_modify.status==="on")&&(to_modify.apply_on==="res")&& (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains)))) {
-      if (to_modify.action==="add") {
-        let new_header = {"name" :to_modify.header_name,"value":to_modify.header_value};
-	e.responseHeaders.push(new_header);
-	if (config.debug_mode) log("Add response header : name=" + to_modify.header_name
-							+ ",value=" + to_modify.header_value + " for url " + e.url);
+    if ((to_modify.status === "on") && (to_modify.apply_on === "res") && (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains)))) {
+      if (to_modify.action === "add") {
+        let new_header = { "name": to_modify.header_name, "value": to_modify.header_value };
+        e.responseHeaders.push(new_header);
+        if (config.debug_mode) log("Add response header : name=" + to_modify.header_name
+          + ",value=" + to_modify.header_value + " for url " + e.url);
       }
-      else if (to_modify.action==="modify") {
+      else if (to_modify.action === "modify") {
         for (let header of e.responseHeaders) {
           if (header.name.toLowerCase() === to_modify.header_name.toLowerCase()) {
             if (config.debug_mode) log("Modify response header :  name= " + to_modify.header_name + ",old value="
-										+ header.value +  ",new value=" + to_modify.header_value  + " for url " + e.url);
+              + header.value + ",new value=" + to_modify.header_value + " for url " + e.url);
             header.value = to_modify.header_value;
           }
         }
       }
-      else if (to_modify.action==="delete") {
+      else if (to_modify.action === "delete") {
         let index = -1;
-        for (let i=0; i < e.responseHeaders.length; i++) {
-          if (e.responseHeaders[i].name.toLowerCase() === to_modify.header_name.toLowerCase())  index=i;
-	}
-        if (index!==-1) {
-          e.responseHeaders.splice(index,1);
+        for (let i = 0; i < e.responseHeaders.length; i++) {
+          if (e.responseHeaders[i].name.toLowerCase() === to_modify.header_name.toLowerCase()) index = i;
+        }
+        if (index !== -1) {
+          e.responseHeaders.splice(index, 1);
           if (config.debug_mode) log("Delete response header :  name=" + to_modify.header_name.toLowerCase()
-									+ " for url " + e.url);		
+            + " for url " + e.url);
         }
       }
     }
   }
   if (config.debug_mode) log("End modify response headers for url " + e.url);
-  return {responseHeaders: e.responseHeaders};
+  return { responseHeaders: e.responseHeaders };
 }
 
 
@@ -198,26 +198,26 @@ function rewriteResponseHeader(e) {
 *
 **/
 function notify(message) {
-  if (message==="reload") {
+  if (message === "reload") {
     if (config.debug_mode) log("Reload configuration");
-    loadFromBrowserStorage(['config'],function (result) {
-      config=JSON.parse(result.config);
-      if (started==="on") {
+    loadFromBrowserStorage(['config'], function (result) {
+      config = JSON.parse(result.config);
+      if (started === "on") {
         removeListener();
         addListener();
       }
     });
   }
-  else if (message==="off") {
+  else if (message === "off") {
     removeListener();
-    chrome.browserAction.setIcon({ path: "icons/modify-32.png"});
-    started="off";
+    chrome.browserAction.setIcon({ path: "icons/modify-32.png" });
+    started = "off";
     if (config.debug_mode) log("Stop modifying headers");
   }
-  else if (message==="on") {
+  else if (message === "on") {
     addListener();
-    chrome.browserAction.setIcon({ path: "icons/modify-green-32.png"});
-    started="on";
+    chrome.browserAction.setIcon({ path: "icons/modify-green-32.png" });
+    started = "on";
     if (config.debug_mode) log("Start modifying headers");
   }
 }
@@ -229,30 +229,28 @@ function notify(message) {
 */
 function addListener() {
   let target = config.target_page;
-  if ((target==="*")||(target==="")||(target===" ")) target="<all_urls>";
-  
-  // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest
-  if (isChrome)
-  {
-	chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
-                                          {urls: target.split(";")},
-                                          ["blocking", "requestHeaders","extraHeaders"]);
+  if ((target === "*") || (target === "") || (target === " ")) target = "<all_urls>";
 
-	chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
-                                          {urls: target.split(";")},
-                                          ["blocking", "responseHeaders","extraHeaders"]);
+  // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest
+  if (isChrome) {
+    chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
+      { urls: target.split(";") },
+      ["blocking", "requestHeaders", "extraHeaders"]);
+
+    chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
+      { urls: target.split(";") },
+      ["blocking", "responseHeaders", "extraHeaders"]);
   }
-  
-  else
-  {
-	  chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
-                                          {urls: target.split(";")},
-                                          ["blocking", "requestHeaders"]);
-	  chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
-                                          {urls: target.split(";")},
-                                          ["blocking", "responseHeaders"]);
+
+  else {
+    chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
+      { urls: target.split(";") },
+      ["blocking", "requestHeaders"]);
+    chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
+      { urls: target.split(";") },
+      ["blocking", "responseHeaders"]);
   }
-  
+
 }
 
 
