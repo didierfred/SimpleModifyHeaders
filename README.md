@@ -38,7 +38,12 @@ The parameters button permits to :
 ## Firefox specific issue
 According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exist, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add"
   
-
+## Extension permissions
+In order to work, the following browser permissions are needed for the extension: 
+- storage : needed to store the configuration and the rules
+- activeTab, tabs : needed to show the configuration screen in the browser tab.
+- webRequest,webRequestBlocking,<all_urls> :  needed to modify the urls according to the rules table. 
+  
 ## License
 The code is opensource under Mozilla Public License 2.0 
 
