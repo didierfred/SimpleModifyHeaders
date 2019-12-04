@@ -40,11 +40,13 @@ According to the version of Firefox, the addition of a new header behaves differ
 
 ## Limitation
 
-Due to limitation in the webRequest API of browsers, header of request which are invoked by Javascript could not be modified. 
-
+Due to limitation in the webRequest API of browsers, headers of request which are invoked by Javascript could not be modified. 
+  
+## Extension permissions
+In order to work, the following browser permissions are needed for the extension: 
+- storage : needed to store the configuration and the rules
+- activeTab, tabs : needed to show the configuration screen in the browser tab.
+- webRequest,webRequestBlocking,<all_urls> :  needed to modify the headers according to the rules table. 
+  
 ## License
 The code is opensource under Mozilla Public License 2.0 
-
-
-
-
