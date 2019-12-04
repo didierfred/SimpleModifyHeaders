@@ -37,7 +37,10 @@ The parameters button permits to :
 
 ## Firefox specific issue
 According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exist, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add"
-  
+
+## Limitation
+
+Due to limitation in the webRequest API of browsers, header of request which are invoked by Javascript could not be modified. 
 
 ## License
 The code is opensource under Mozilla Public License 2.0 
