@@ -228,8 +228,8 @@ function notify(message) {
 * Make it "blocking" so we can modify the headers.
 */
 function addListener() {
-  let target = config.target_page;
-  if ((target === "*") || (target === "") || (target === " ")) target = "<all_urls>";
+  let target = config.target_page.replace(' ',''); 
+  if ((target === "*") || (target === "")) target = "<all_urls>";
 
   // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest#life_cycle_footnote
   if (isChrome) {
