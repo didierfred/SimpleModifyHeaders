@@ -109,26 +109,51 @@ function useUrlContainsClick() {
 * Add a new configuration line on the UI
 **/
 function appendLine(url_contains,action,header_name,header_value,comment,apply_on,status) {
-  let html = "<td";
-  if (!use_url_contains) html=html+" hidden";
-  html = html + "><input class=\""+ input_field_style+ "\" id=\"url_contains"+ line_number + "\"></input></td>";
-  html =  html + "<td><select class=\"form_control select_field\" id=\"select_action" + line_number
-			   + "\" disable=false><option value=\"add\">Add</option><option value=\"modify\">Modify</option><option value=\"delete\">Delete</option></select></td>";
-  html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_name"+ line_number + "\"></input></td>";
-  html = html + "<td><input class=\"" + input_field_style + "\" id=\"header_value"+ line_number + "\"></input></td>";
-  html = html + "<td";
-  if (!show_comments) html=html+" hidden";
-  html = html + "><input class=\""+ input_field_style + "\" id=\"comment"+ line_number + "\"></input></td>";
-  html = html + "<td><select class=\"form_control select_field\" id=\"apply_on"
-			  + line_number + "\"><option value=\"req\"> Request </option><option value=\"res\">Response</option></select></td>";
-  html = html +  "<td><a href=\"#\" title=\"Activate/Descativate rule\" id=\"activate_button"
-			  + line_number + "\" class=\"btn btn-primary btn-sm\">ON  <span class=\"glyphicon glyphicon-ok\"></span></a></td>";
-  html = html +  "<td><a href=\"#\" title=\"Move line up\" id=\"up_button"
-			  + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-up\"></span></a></td>";
-  html = html +  "<td><a href=\"#\" title=\"Move line down\" id=\"down_button"
-		      + line_number + "\" class=\"btn btn-default btn-sm\"> <span class=\"glyphicon glyphicon-arrow-down\"></span></a></td>";
-  html = html +  "<td><a href=\"#\" title=\"Delete line\" id=\"delete_button"
-			  + line_number + "\" class=\"btn btn-primary btn-sm\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>";
+  let html = `
+    <td ${use_url_contains ? '' : ' hidden'}>
+      <input class="${input_field_style}" id="url_contains${line_number}" />
+    </td>
+    <td>
+      <select class="form_control select_field" id="select_action${line_number}"> disable="false">
+        <option value="add">Add</option>
+        <option value="modify">Modify</option>
+        <option value="delete">Delete</option>
+      </select>
+    </td>
+    <td>
+      <input class="${input_field_style}" id="header_name${line_number}" />
+    </td>
+    <td>
+      <input class="${input_field_style}" id="header_value${line_number}" />
+    </td>
+    <td${show_comments ? '' : ' hidden'}>
+      <input class="${input_field_style}" id="comment${line_number}" />
+    </td>
+    <td>
+      <select class="form_control select_field" id="apply_on${line_number}">
+        <option value="req">Request</option>
+        <option value="res">Response</option>
+      </select>
+    </td>
+    <td>
+      <button type="button" class="btn btn-primary btn-sm" title="Activate/deactivate rule" id="activate_button${line_number}">ON <span class="glyphicon glyphicon-ok"></span></button>
+    </td>
+    <td>
+      <button type="button" class="btn btn-default btn-sm" title="Move line up" id="up_button${line_number}">
+        <span class="glyphicon glyphicon-arrow-up"></span>
+      </button>
+    </td>
+    <td>
+      <button type="button" class="btn btn-default btn-sm" title="Move line down" id="down_button${line_number}">
+        <span class="glyphicon glyphicon-arrow-down"></span>
+      </button>
+    </td>
+    <td>
+      <button type="button" class="btn btn-default btn-sm" title="Delete line" id="delete_button${line_number}">
+        <span class="glyphicon glyphicon-trash"></span>
+      </button>
+    </td>
+  `;
 
   let newTR = document.createElement("tr");
   newTR.id="line" + line_number;
@@ -194,12 +219,12 @@ function reshapeTable() {
   }
 
   for (let i=0;i<tr_elements.length;i++) {
-    tr_elements[i].childNodes[4].childNodes[0].className=input_field_style;
-    tr_elements[i].childNodes[4].hidden = (!show_comments);
-    tr_elements[i].childNodes[3].childNodes[0].className=input_field_style;
-    tr_elements[i].childNodes[2].childNodes[0].className=input_field_style;
-    tr_elements[i].childNodes[0].childNodes[0].className=input_field_style;
-    tr_elements[i].childNodes[0].hidden = (!use_url_contains);
+    tr_elements[i].children[4].children[0].className=input_field_style;
+    tr_elements[i].children[4].hidden = (!show_comments);
+    tr_elements[i].children[3].children[0].className=input_field_style;
+    tr_elements[i].children[2].children[0].className=input_field_style;
+    tr_elements[i].children[0].children[0].className=input_field_style;
+    tr_elements[i].children[0].hidden = (!use_url_contains);
   }
   th_elements[4].hidden = (!show_comments);
   th_elements[0].hidden = (!use_url_contains);
@@ -215,13 +240,13 @@ function create_configuration_data() {
   let debug_mode=false;
   let show_comments=false;
   for (let i=0;i<tr_elements.length;i++) {
-    const url_contains = tr_elements[i].childNodes[0].childNodes[0].value;
-    const action = tr_elements[i].childNodes[1].childNodes[0].value;
-    const header_name = tr_elements[i].childNodes[2].childNodes[0].value;
-    const header_value = tr_elements[i].childNodes[3].childNodes[0].value;
-    const comment = tr_elements[i].childNodes[4].childNodes[0].value;
-    const apply_on = tr_elements[i].childNodes[5].childNodes[0].value;
-    const status = getButtonStatus(tr_elements[i].childNodes[6].childNodes[0]);
+    const url_contains = tr_elements[i].children[0].children[0].value;
+    const action = tr_elements[i].children[1].children[0].value;
+    const header_name = tr_elements[i].children[2].children[0].value;
+    const header_value = tr_elements[i].children[3].children[0].value;
+    const comment = tr_elements[i].children[4].children[0].value;
+    const apply_on = tr_elements[i].children[5].children[0].value;
+    const status = getButtonStatus(tr_elements[i].children[6].children[0]);
     headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
   }
   if (document.getElementById("debug_mode").checked) debug_mode=true;
