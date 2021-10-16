@@ -97,6 +97,29 @@ function storeInBrowserStorage(item, callback_function) {
   chrome.storage.local.set(item, callback_function);
 }
 
+/*
+ * This function set a key-value pair in HTTP header "Cookie", 
+ *   and returns the value of HTTP header after modification. 
+ * If key already exists, it modify the value. 
+ * If key doesn't exist, it add the key-value pair. 
+ * If value is undefined, it delete the key-value pair from cookies. 
+ * Recolic K <root@recolic.net>
+ */
+function cookie_keyvalues_set(original_cookies, key, value) {
+    let new_element = key + "=" + value; // not used if value is undefined. 
+    let cookies_ar = original_cookies.split(";").filter(e => e.trim().length > 0);
+    let selected_cookie_index = cookies_ar.findIndex(kv => kv.startsWith(key+"="));
+    if (selected_cookie_index == -1)
+        cookies_ar.push(new_element);
+    else {
+        if (value === undefined)
+            cookies_ar.splice(selected_cookie_index, 1);
+        else
+            cookies_ar.splice(selected_cookie_index, 1, new_element);
+    }
+    return cookies_ar.join(";");
+}
+
 
 /*
 * Standard function to log messages
@@ -140,6 +163,29 @@ function rewriteRequestHeader(e) {
           e.requestHeaders.splice(index, 1);
           if (config.debug_mode) log("Delete request header :  name=" + to_modify.header_name.toLowerCase() +
             " for url " + e.url);
+        }
+      }
+      else if (to_modify.action === "cookie_add_or_modify") {
+        let header_cookie = e.requestHeaders.find(header => header.name.toLowerCase() === "cookie");
+        let new_cookie = cookie_keyvalues_set(header_cookie === undefined ? "" : header_cookie.value, to_modify.header_name, to_modify.header_value);
+        if (header_cookie === undefined) {
+          e.requestHeaders.push({"name": "Cookie", "value": new_cookie});
+          if (config.debug_mode) log("cookie_add_or_modify new_header : name=Cookie,value=" + new_cookie + " for url " + e.url);
+        }
+        else {
+          header_cookie.value = new_cookie;
+          if (config.debug_mode) log("cookie_add_or_modify modify_header : name=Cookie,value=" + new_cookie + " for url " + e.url);
+        }
+      }
+      else if (to_modify.action === "cookie_delete") {
+        let header_cookie = e.requestHeaders.find(header => header.name.toLowerCase() === "cookie");
+        let new_cookie = cookie_keyvalues_set(header_cookie === undefined ? "" : header_cookie.value, to_modify.header_name, to_modify.header_value);
+        if (header_cookie === undefined) {
+          if (config.debug_mode) log("cookie_delete: no cookie header found. doing nothing for url " + e.url);
+        }
+        else {
+          header_cookie.value = new_cookie;
+          if (config.debug_mode) log("cookie_delete modify_header : name=Cookie,value=" + new_cookie + " for url " + e.url);
         }
       }
     }
