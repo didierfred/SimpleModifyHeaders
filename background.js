@@ -109,7 +109,7 @@ function storeInBrowserStorage(item, callback_function) {
 function cookie_keyvalues_set(original_cookies, key, value) {
     let new_element = key + "=" + value; // not used if value is undefined. 
     let cookies_ar = original_cookies.split(";").filter(e => e.trim().length > 0);
-    let selected_cookie_index = cookies_ar.findIndex(kv => kv.startsWith(key+"="));
+    let selected_cookie_index = cookies_ar.findIndex(kv => kv.trim().startsWith(key+"="));
     if (selected_cookie_index == -1)
         cookies_ar.push(new_element);
     else {
