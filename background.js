@@ -180,7 +180,7 @@ function rewriteRequestHeader(e) {
       }
       else if (to_modify.action === "cookie_delete") {
         let header_cookie = e.requestHeaders.find(header => header.name.toLowerCase() === "cookie");
-        let new_cookie = cookie_keyvalues_set(header_cookie === undefined ? "" : header_cookie.value, to_modify.header_name, to_modify.header_value);
+        let new_cookie = cookie_keyvalues_set(header_cookie === undefined ? "" : header_cookie.value, to_modify.header_name, undefined);
         if (header_cookie === undefined) {
           if (config.debug_mode) log("cookie_delete: no cookie header found. doing nothing for url " + e.url);
         }
