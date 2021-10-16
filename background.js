@@ -103,6 +103,7 @@ function storeInBrowserStorage(item, callback_function) {
  * If key already exists, it modify the value. 
  * If key doesn't exist, it add the key-value pair. 
  * If value is undefined, it delete the key-value pair from cookies. 
+ * Assuming that, the same key SHOULD NOT appear twice in cookies. 
  * Recolic K <root@recolic.net>
  */
 function cookie_keyvalues_set(original_cookies, key, value) {
