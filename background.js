@@ -265,7 +265,6 @@ function rewriteResponseHeader(e) {
             header.name.toLowerCase() === "set-cookie" && 
             header.value.toLowerCase().trim().startsWith(to_modify.header_name.toLowerCase()+"=")
         );
-
         let new_header_value = set_cookie_modify_cookie_value(header_cookie === undefined ? "" : header_cookie.value, to_modify.header_name, to_modify.header_value);
         if (header_cookie === undefined) {
           log("SimpleModifyHeaders.Warning: you're using cookie_add_or_modify in Response. While adding new cookie in response, this plugin only generates `Set-Cookie: cookie-name=cookie-value `, without ANY additional attributes. Add a `Set-Cookie` header if you need them. ");
