@@ -261,7 +261,7 @@ function rewriteResponseHeader(e) {
         }
       }
       else if (to_modify.action === "cookie_add_or_modify") {
-        let header_cookie = e.requestHeaders.find(header => 
+        let header_cookie = e.responseHeaders.find(header => 
             header.name.toLowerCase() === "set-cookie" && 
             header.value.toLowerCase().trim().startsWith(to_modify.header_name.toLowerCase()+"=")
         );
@@ -277,7 +277,7 @@ function rewriteResponseHeader(e) {
         }
       }
       else if (to_modify.action === "cookie_delete") {
-        let index = e.requestHeaders.findIndex(header => 
+        let index = e.responseHeaders.findIndex(header => 
             header.name.toLowerCase() === "set-cookie" && 
             header.value.toLowerCase().trim().startsWith(to_modify.header_name.toLowerCase()+"=")
         );
