@@ -14,9 +14,9 @@ It's possible to:
 
 ## Rules table
 The rules table contains lines with the following parameters:
-- action: add, modify or delete a header field
-- header field name
-- header field value 
+- action: add, modify or delete a header field or a cookie
+- header field name or cookie name
+- header field value or cookie value 
 - comment: a comment 
 - apply on: "request" if the modification applies to the request headers or "response" if the modification applies to the response headers
 - status: on if the modification is active, off otherwise 
