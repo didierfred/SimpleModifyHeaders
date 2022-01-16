@@ -1,6 +1,6 @@
 # SimpleModifyHeaders V 1.7.0
 
-Extension for Firefox and Chrome. (The extension can be installed via [this link](https://addons.mozilla.org/fr/firefox/addon/simple-modify-header/) for Firefox and via [this link](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic) for Chrome)
+Extension for Firefox and Chrome. (The extension can be installed via [this link](https://addons.mozilla.org/firefox/addon/simple-modify-header/) for Firefox and via [this link](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic) for Chrome)
 
 The extension rewrites the headers based on a rules table. 
 
@@ -40,7 +40,7 @@ According to the version of Firefox, the addition of a new header behaves differ
 
 ## Limitation
 
-Due to limitations in the webRequest API of browsers, headers of requests, which are invoked by Javascript could not be modified. 
+Due to limitations in the webRequest API of browsers, headers of requests, which are invoked by Javascript, could not be modified. 
   
 ## Extension permissions
 In order to work, the following browser permissions are needed for the extension: 
