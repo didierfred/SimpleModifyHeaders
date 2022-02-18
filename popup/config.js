@@ -10,6 +10,8 @@ let started;
 let show_comments;
 let use_url_contains;
 let input_field_style;
+let check_all;
+let import_flag;
 
 
 window.onload = function() {
@@ -36,6 +38,7 @@ function initConfigurationPage() {
 	  document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
 	  document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
 	  document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
+	  document.getElementById('append_button').addEventListener('click',function (e) {appendData(e);});
 	  document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
 	  document.getElementById('add_button').addEventListener('click',function (e) {appendLine("","add","-","-","","req","on");});
 	  document.getElementById('start_img').addEventListener('click',function (e) {startModify();});
@@ -43,8 +46,9 @@ function initConfigurationPage() {
 	  checkTargetPageField();
 	  document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
 	  document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
+	  document.querySelector("#export_row_header").addEventListener('click',function (e) {selectAll();});
 
-          loadFromBrowserStorage(['started'], function (result) {
+      loadFromBrowserStorage(['started'], function (result) {
 	    started = result.started;
 	    if (started==="on") document.getElementById("start_img").src = "img/stop.png";
           });
@@ -56,13 +60,15 @@ function initConfigurationPage() {
 }
 
 function initGlobalValue()
- {
+{
   line_number = 1;
   started = "off";
   show_comments = true;
   use_url_contains = false;
   input_field_style="form_control input_field_small";
- }
+  check_all = true;
+  import_flag = true;
+}
 
 
 function loadFromBrowserStorage(item,callback_function) {
@@ -236,20 +242,22 @@ function reshapeTable() {
 * Create a JSON String representing the configuration data
 *
 **/
-function create_configuration_data() {
+function create_configuration_data(saveOrExport) {
   let tr_elements = document.querySelectorAll("#config_tab tr");
   let headers = [];
   let debug_mode=false;
   let show_comments=false;
   for (let i=0;i<tr_elements.length;i++) {
-    const url_contains = tr_elements[i].children[0].children[0].value;
-    const action = tr_elements[i].children[1].children[0].value;
-    const header_name = tr_elements[i].children[2].children[0].value;
-    const header_value = tr_elements[i].children[3].children[0].value;
-    const comment = tr_elements[i].children[4].children[0].value;
-    const apply_on = tr_elements[i].children[5].children[0].value;
-    const status = getButtonStatus(tr_elements[i].children[6].children[0]);
-    headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
+	if (saveOrExport=="save" || getButtonStatus(tr_elements[i].children[10].children[0])=="on") {
+      const url_contains = tr_elements[i].children[0].children[0].value;
+      const action = tr_elements[i].children[1].children[0].value;
+      const header_name = tr_elements[i].children[2].children[0].value;
+      const header_value = tr_elements[i].children[3].children[0].value;
+      const comment = tr_elements[i].children[4].children[0].value;
+      const apply_on = tr_elements[i].children[5].children[0].value;
+      const status = getButtonStatus(tr_elements[i].children[6].children[0]);
+      headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
+    }
   }
   if (document.getElementById("debug_mode").checked) debug_mode=true;
   if (document.getElementById("show_comments").checked) show_comments=true;
@@ -287,7 +295,7 @@ function isTargetValid(target) {
 **/
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
-  storeInBrowserStorage({config:create_configuration_data()},function() {
+  storeInBrowserStorage({config:create_configuration_data("save")},function() {
     chrome.runtime.sendMessage("reload");
   });
   return true;
@@ -298,7 +306,7 @@ function saveData() {
 **/
 function exportData() {
   // Create file data
-  let to_export= create_configuration_data();
+  let to_export= create_configuration_data("export");
 
   // Create file to save
   let a         = document.createElement('a');
@@ -314,20 +322,36 @@ function exportData() {
 }
 
 /**
-* Choose a file and import data from the choosen file
-*
+* Append data from file
+**/
+function appendData(evt) {
+  if (window.confirm("This will append data to your actual configuration, do you want to continue?")) {
+    import_flag=false;
+    openFile();
+  }
+}
+
+/**
+* Import data from file
 **/
 function importData(evt) {
-  // create an input field in the iframe
-  if (window.confirm("This will erase your actual configuration, do you want to continue ?")) {
-    let input = document.createElement("input");
-    input.type="file";
-    input.addEventListener('change', readSingleFile, false);
-    let myf = document.getElementById("download");
-    myf = myf.contentWindow.document || myf.contentDocument;
-    myf.body.appendChild(input);
-    input.click();
+  if (window.confirm("This will erase your actual configuration, do you want to continue?")) {
+    import_flag=true;
+    openFile();
   }
+}
+
+// Choose a file
+function openFile() {
+  // create an input field in the iframe
+  let input = document.createElement("input");
+  input.type="file";
+  input.accept=".conf";
+  input.addEventListener('change', readSingleFile, false);
+  let myf = document.getElementById("download");
+  myf = myf.contentWindow.document || myf.contentDocument;
+  myf.body.appendChild(input);
+  input.click();
 }
 
 /**
@@ -373,11 +397,26 @@ function loadConfiguration(configuration) {
     return;
   }
 
-  // store the conf in the local storage
-  storeInBrowserStorage({config:JSON.stringify(config)},function() {
-   // load the new conf
-   reloadConfigPage();
-  });
+  // append, not replace
+  if (!import_flag) {
+	loadFromBrowserStorage(['config'],function (result) {
+	  appConfig = JSON.parse(result.config);
+	  for (rule of config.headers) {
+		appConfig.headers.push(rule);
+	  }
+	  storeInBrowserStorage({config:JSON.stringify(appConfig)},function() {
+		reloadConfigPage();
+	  });
+	});
+  }
+  // replace
+  else {
+    // store the conf in the local storage
+    storeInBrowserStorage({config:JSON.stringify(config)},function() {
+      // load the new conf
+      reloadConfigPage();
+    });
+  }
 }
 
 function convertConfigurationFormat1dot0ToCurrentFormat(config) {
