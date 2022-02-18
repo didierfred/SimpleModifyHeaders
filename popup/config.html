@@ -32,14 +32,14 @@
 				<tr>
 					<td style="text-align:left" > <strong> Url Patterns* : </strong> <input id="targetPage"  class="form_control input_url" type="text" value=""> </td>
 					<td style="text-align:right"> 
-						<button type="button" id="select_button" class="btn btn-primary btn-sm">
-          						<span class="glyphicon glyphicon-check"></span> Select
-						</button>
 						<button type="button" id="export_button" class="btn btn-primary btn-sm">
           						<span class="glyphicon glyphicon-export"></span> Export
 						</button>
 						<button type="button" id="import_button" class="btn btn-primary btn-sm">
           						<span class="glyphicon glyphicon-import"></span> Import
+						</button>
+						<button type="button" id="append_button" class="btn btn-primary btn-sm">
+          						<span class="glyphicon glyphicon-import"></span> Append
 						</button>
 						<button type="button" id="parameters_button" class="btn btn-primary btn-sm">
           						<span class="glyphicon glyphicon-cog"></span> Parameters
@@ -62,7 +62,7 @@
 						<th> </th>
 						<th> </th>
 						<th> </th>
-						<th> Export</th>
+						<th><button type="button" id="export_row_header"> Export</button></th>
 					</tr>
 				</thead>
 				<tbody id="config_tab">
