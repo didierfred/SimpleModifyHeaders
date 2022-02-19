@@ -60,7 +60,7 @@ function initConfigurationPage() {
 }
 
 function initGlobalValue()
-{
+ {
   line_number = 1;
   started = "off";
   show_comments = true;
@@ -68,7 +68,7 @@ function initGlobalValue()
   input_field_style="form_control input_field_small";
   check_all = true;
   import_flag = true;
-}
+ }
 
 
 function loadFromBrowserStorage(item,callback_function) {
@@ -161,6 +161,11 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
         <span class="glyphicon glyphicon-trash"></span>
       </button>
     </td>
+    <td>
+	  <button type="button" class="btn btn-primary btn-sm" title="Select rule" id="check_button${line_number}">
+        <span class="glyphicon glyphicon-check"></span>
+      </button>
+    </td>
   `;
 
   let newTR = document.createElement("tr");
@@ -180,6 +185,7 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
   document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {deleteLine(line_number_to_modify)});
   document.getElementById('up_button'+line_number).addEventListener('click',function (e) {invertLine(line_number_to_modify,line_number_to_modify-1)});
   document.getElementById('down_button'+line_number).addEventListener('click',function (e) {invertLine(line_number_to_modify,line_number_to_modify+1)});
+  document.getElementById('check_button'+line_number).addEventListener('click',function (e) {switchCheckButton(line_number_to_modify)});
   line_number++;
 }
 
@@ -197,6 +203,17 @@ function setButtonStatus(button,status) {
   }
 }
 
+function setCheckButtonStatus(button,status) {
+  if (status==="on") {
+    button.className="btn btn-primary btn-sm";
+    button.innerHTML="<span class=\"glyphicon glyphicon-check\"></span>";
+  }
+  else {
+    button.className="btn btn-default btn-sm";
+    button.innerHTML="<span class=\"glyphicon glyphicon-unchecked\"></span>";
+  }
+}
+
 function getButtonStatus(button) {
   if (button.className==="btn btn-primary btn-sm") return "on";
   return "off";
@@ -208,6 +225,14 @@ function switchActivateButton(button_number) {
   if (getButtonStatus(activate_button)==="on") setButtonStatus(activate_button,"off");
   // Button is OFF
   else setButtonStatus(activate_button,"on");
+}
+
+function switchCheckButton(button_number) {
+  const check_button = document.getElementById("check_button"+button_number);
+  // Button is ON
+  if (getButtonStatus(check_button)==="on") setCheckButtonStatus(check_button,"off");
+  // Button is OFF
+  else setCheckButtonStatus(check_button,"on");
 }
 
 /** END ACTIVATE BUTTON MANAGEMENT **/
@@ -482,6 +507,7 @@ function deleteLine(line_number_to_delete) {
       document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
       setButtonStatus(document.getElementById("activate_button"+i),getButtonStatus(document.getElementById("activate_button"+j)));
       document.getElementById("apply_on"+i).value = document.getElementById("apply_on"+j).value;
+	  setCheckButtonStatus(document.getElementById("check_button"+i),getButtonStatus(document.getElementById("check_button"+j)));
     }
   }
 
@@ -505,6 +531,7 @@ function invertLine(line1, line2) {
   const comment1 = document.getElementById("comment"+line1).value;
   const select_status1 = getButtonStatus(document.getElementById("activate_button"+line1));
   const apply_on1 = document.getElementById("apply_on"+line1).value;
+  const check_status1 = getButtonStatus(document.getElementById("check_button"+line1));
 
   // Copy line 2 to line 1
   document.getElementById("select_action"+line1).value = document.getElementById("select_action"+line2).value;
@@ -514,6 +541,7 @@ function invertLine(line1, line2) {
   document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
   setButtonStatus(document.getElementById("activate_button"+line1),getButtonStatus(document.getElementById("activate_button"+line2)));
   document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
+  setCheckButtonStatus(document.getElementById("check_button"+line1),getButtonStatus(document.getElementById("check_button"+line2)));
 
   // Copy line 1 to line 2
   document.getElementById("select_action"+line2).value = select_action1;
@@ -523,6 +551,7 @@ function invertLine(line1, line2) {
   document.getElementById("comment"+line2).value = comment1;
   setButtonStatus(document.getElementById("activate_button"+line2),select_status1);
   document.getElementById("apply_on"+line2).value = apply_on1;
+  setCheckButtonStatus(document.getElementById("check_button"+line2),check_status1);
 }
 
 /**
