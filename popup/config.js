@@ -289,6 +289,14 @@ function isTargetValid(target) {
   return true;
 }
 
+function selectAll() {
+  check_all=!check_all;
+  let buttons = document.querySelectorAll("#config_tab tr td > [title='Select rule']");
+  for (let i=0;i<buttons.length;i++) {
+	setCheckButtonStatus(buttons[i],check_all ? "on" : "off");
+  }
+}
+
 /**
 *  save the data to the local storage and restart modify header
 * show a warning if url patterns are invalid
