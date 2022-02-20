@@ -168,7 +168,7 @@ function log(message) {
 function rewriteRequestHeader(e) {
   if (config.debug_mode) log("Start modify request headers for url " + e.url);
   for (let to_modify of config.headers) {
-    if ((to_modify.status === "on") && (to_modify.apply_on === "req") && (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains)))) {
+    if ((to_modify.status === "on") && (to_modify.apply_on === "req") && (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains.trim())))) {
       if (to_modify.action === "add") {
         let new_header = { "name": to_modify.header_name, "value": to_modify.header_value };
         e.requestHeaders.push(new_header);
@@ -233,7 +233,7 @@ function rewriteRequestHeader(e) {
 function rewriteResponseHeader(e) {
   if (config.debug_mode) log("Start modify response headers for url " + e.url);
   for (let to_modify of config.headers) {
-    if ((to_modify.status === "on") && (to_modify.apply_on === "res") && (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains)))) {
+    if ((to_modify.status === "on") && (to_modify.apply_on === "res") && (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains.trim())))) {
       if (to_modify.action === "add") {
         let new_header = { "name": to_modify.header_name, "value": to_modify.header_value };
         e.responseHeaders.push(new_header);
