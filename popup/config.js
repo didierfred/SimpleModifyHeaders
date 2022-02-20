@@ -46,7 +46,7 @@ function initConfigurationPage() {
 	  checkTargetPageField();
 	  document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
 	  document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
-	  document.querySelector("#export_row_header").addEventListener('click',function (e) {selectAll();});
+	  document.querySelector("#export_row_header").addEventListener('click',function (e) {switchAllExportButtons();});
 
       loadFromBrowserStorage(['started'], function (result) {
 	    started = result.started;
@@ -147,6 +147,11 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
       <button type="button" class="btn btn-primary btn-sm" title="Activate/deactivate rule" id="activate_button${line_number}">ON <span class="glyphicon glyphicon-ok"></span></button>
     </td>
     <td>
+	  <button type="button" class="btn btn-primary btn-sm" title="Select rule for export" id="check_button${line_number}">
+        To export <span class="glyphicon glyphicon-ok"></span>
+      </button>
+    </td>
+    <td>
       <button type="button" class="btn btn-default btn-sm" title="Move line up" id="up_button${line_number}">
         <span class="glyphicon glyphicon-arrow-up"></span>
       </button>
@@ -156,14 +161,10 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
         <span class="glyphicon glyphicon-arrow-down"></span>
       </button>
     </td>
+
     <td>
       <button type="button" class="btn btn-default btn-sm" title="Delete line" id="delete_button${line_number}">
         <span class="glyphicon glyphicon-trash"></span>
-      </button>
-    </td>
-    <td>
-	  <button type="button" class="btn btn-primary btn-sm" title="Select rule" id="check_button${line_number}">
-        <span class="glyphicon glyphicon-check"></span>
       </button>
     </td>
   `;
@@ -185,7 +186,7 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
   document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {deleteLine(line_number_to_modify)});
   document.getElementById('up_button'+line_number).addEventListener('click',function (e) {invertLine(line_number_to_modify,line_number_to_modify-1)});
   document.getElementById('down_button'+line_number).addEventListener('click',function (e) {invertLine(line_number_to_modify,line_number_to_modify+1)});
-  document.getElementById('check_button'+line_number).addEventListener('click',function (e) {switchCheckButton(line_number_to_modify)});
+  document.getElementById('check_button'+line_number).addEventListener('click',function (e) {switchExportButton(line_number_to_modify)});
   line_number++;
 }
 
@@ -203,14 +204,14 @@ function setButtonStatus(button,status) {
   }
 }
 
-function setCheckButtonStatus(button,status) {
+function setExportButtonStatus(button,status) {
   if (status==="on") {
     button.className="btn btn-primary btn-sm";
-    button.innerHTML="<span class=\"glyphicon glyphicon-check\"></span>";
+    button.innerHTML="To export <span class=\"glyphicon glyphicon-ok\"></span>";
   }
   else {
     button.className="btn btn-default btn-sm";
-    button.innerHTML="<span class=\"glyphicon glyphicon-unchecked\"></span>";
+    button.innerHTML="No export <span class=\"glyphicon glyphicon-ban-circle\"></span>";
   }
 }
 
@@ -227,12 +228,12 @@ function switchActivateButton(button_number) {
   else setButtonStatus(activate_button,"on");
 }
 
-function switchCheckButton(button_number) {
+function switchExportButton(button_number) {
   const check_button = document.getElementById("check_button"+button_number);
   // Button is ON
-  if (getButtonStatus(check_button)==="on") setCheckButtonStatus(check_button,"off");
+  if (getButtonStatus(check_button)==="on") setExportButtonStatus(check_button,"off");
   // Button is OFF
-  else setCheckButtonStatus(check_button,"on");
+  else setExportButtonStatus(check_button,"on");
 }
 
 /** END ACTIVATE BUTTON MANAGEMENT **/
@@ -314,11 +315,11 @@ function isTargetValid(target) {
   return true;
 }
 
-function selectAll() {
+function switchAllExportButtons() {
   check_all=!check_all;
-  let buttons = document.querySelectorAll("#config_tab tr td > [title='Select rule']");
+  let buttons = document.querySelectorAll("#config_tab tr td > [title='Select rule for export']");
   for (let i=0;i<buttons.length;i++) {
-	setCheckButtonStatus(buttons[i],check_all ? "on" : "off");
+	setExportButtonStatus(buttons[i],check_all ? "on" : "off");
   }
 }
 
@@ -507,7 +508,7 @@ function deleteLine(line_number_to_delete) {
       document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
       setButtonStatus(document.getElementById("activate_button"+i),getButtonStatus(document.getElementById("activate_button"+j)));
       document.getElementById("apply_on"+i).value = document.getElementById("apply_on"+j).value;
-	  setCheckButtonStatus(document.getElementById("check_button"+i),getButtonStatus(document.getElementById("check_button"+j)));
+	  setExportButtonStatus(document.getElementById("check_button"+i),getButtonStatus(document.getElementById("check_button"+j)));
     }
   }
 
@@ -541,7 +542,7 @@ function invertLine(line1, line2) {
   document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
   setButtonStatus(document.getElementById("activate_button"+line1),getButtonStatus(document.getElementById("activate_button"+line2)));
   document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
-  setCheckButtonStatus(document.getElementById("check_button"+line1),getButtonStatus(document.getElementById("check_button"+line2)));
+  setExportButtonStatus(document.getElementById("check_button"+line1),getButtonStatus(document.getElementById("check_button"+line2)));
 
   // Copy line 1 to line 2
   document.getElementById("select_action"+line2).value = select_action1;
@@ -551,7 +552,7 @@ function invertLine(line1, line2) {
   document.getElementById("comment"+line2).value = comment1;
   setButtonStatus(document.getElementById("activate_button"+line2),select_status1);
   document.getElementById("apply_on"+line2).value = apply_on1;
-  setCheckButtonStatus(document.getElementById("check_button"+line2),check_status1);
+  setExportButtonStatus(document.getElementById("check_button"+line2),check_status1);
 }
 
 /**
