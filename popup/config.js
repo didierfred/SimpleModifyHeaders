@@ -10,6 +10,8 @@ let started;
 let show_comments;
 let use_url_contains;
 let input_field_style;
+let check_all;
+let import_flag;
 
 
 window.onload = function() {
@@ -36,6 +38,7 @@ function initConfigurationPage() {
 	  document.getElementById('save_button').addEventListener('click',function (e) {saveData();});
 	  document.getElementById('export_button').addEventListener('click',function (e) {exportData();});
 	  document.getElementById('import_button').addEventListener('click',function (e) {importData(e);});
+	  document.getElementById('append_button').addEventListener('click',function (e) {appendData(e);});
 	  document.getElementById('parameters_button').addEventListener('click',function (e) {showParametersScreen();});
 	  document.getElementById('add_button').addEventListener('click',function (e) {appendLine("","add","-","-","","req","on");});
 	  document.getElementById('start_img').addEventListener('click',function (e) {startModify();});
@@ -43,8 +46,9 @@ function initConfigurationPage() {
 	  checkTargetPageField();
 	  document.getElementById('targetPage').addEventListener('keyup',function (e) {checkTargetPageField();});
 	  document.getElementById('exit_parameters_screen_button').addEventListener('click',function (e) {hideParametersScreen();});
+	  document.querySelector("#export_row_header").addEventListener('click',function (e) {selectAll();});
 
-          loadFromBrowserStorage(['started'], function (result) {
+      loadFromBrowserStorage(['started'], function (result) {
 	    started = result.started;
 	    if (started==="on") document.getElementById("start_img").src = "img/stop.png";
           });
@@ -62,6 +66,8 @@ function initGlobalValue()
   show_comments = true;
   use_url_contains = false;
   input_field_style="form_control input_field_small";
+  check_all = true;
+  import_flag = true;
  }
 
 
@@ -155,6 +161,11 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
         <span class="glyphicon glyphicon-trash"></span>
       </button>
     </td>
+    <td>
+	  <button type="button" class="btn btn-primary btn-sm" title="Select rule" id="check_button${line_number}">
+        <span class="glyphicon glyphicon-check"></span>
+      </button>
+    </td>
   `;
 
   let newTR = document.createElement("tr");
@@ -174,6 +185,7 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
   document.getElementById('delete_button'+line_number).addEventListener('click',function (e) {deleteLine(line_number_to_modify)});
   document.getElementById('up_button'+line_number).addEventListener('click',function (e) {invertLine(line_number_to_modify,line_number_to_modify-1)});
   document.getElementById('down_button'+line_number).addEventListener('click',function (e) {invertLine(line_number_to_modify,line_number_to_modify+1)});
+  document.getElementById('check_button'+line_number).addEventListener('click',function (e) {switchCheckButton(line_number_to_modify)});
   line_number++;
 }
 
@@ -191,6 +203,17 @@ function setButtonStatus(button,status) {
   }
 }
 
+function setCheckButtonStatus(button,status) {
+  if (status==="on") {
+    button.className="btn btn-primary btn-sm";
+    button.innerHTML="<span class=\"glyphicon glyphicon-check\"></span>";
+  }
+  else {
+    button.className="btn btn-default btn-sm";
+    button.innerHTML="<span class=\"glyphicon glyphicon-unchecked\"></span>";
+  }
+}
+
 function getButtonStatus(button) {
   if (button.className==="btn btn-primary btn-sm") return "on";
   return "off";
@@ -202,6 +225,14 @@ function switchActivateButton(button_number) {
   if (getButtonStatus(activate_button)==="on") setButtonStatus(activate_button,"off");
   // Button is OFF
   else setButtonStatus(activate_button,"on");
+}
+
+function switchCheckButton(button_number) {
+  const check_button = document.getElementById("check_button"+button_number);
+  // Button is ON
+  if (getButtonStatus(check_button)==="on") setCheckButtonStatus(check_button,"off");
+  // Button is OFF
+  else setCheckButtonStatus(check_button,"on");
 }
 
 /** END ACTIVATE BUTTON MANAGEMENT **/
@@ -236,20 +267,22 @@ function reshapeTable() {
 * Create a JSON String representing the configuration data
 *
 **/
-function create_configuration_data() {
+function create_configuration_data(saveOrExport) {
   let tr_elements = document.querySelectorAll("#config_tab tr");
   let headers = [];
   let debug_mode=false;
   let show_comments=false;
   for (let i=0;i<tr_elements.length;i++) {
-    const url_contains = tr_elements[i].children[0].children[0].value;
-    const action = tr_elements[i].children[1].children[0].value;
-    const header_name = tr_elements[i].children[2].children[0].value;
-    const header_value = tr_elements[i].children[3].children[0].value;
-    const comment = tr_elements[i].children[4].children[0].value;
-    const apply_on = tr_elements[i].children[5].children[0].value;
-    const status = getButtonStatus(tr_elements[i].children[6].children[0]);
-    headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
+	if (saveOrExport=="save" || getButtonStatus(tr_elements[i].children[10].children[0])=="on") {
+      const url_contains = tr_elements[i].children[0].children[0].value;
+      const action = tr_elements[i].children[1].children[0].value;
+      const header_name = tr_elements[i].children[2].children[0].value;
+      const header_value = tr_elements[i].children[3].children[0].value;
+      const comment = tr_elements[i].children[4].children[0].value;
+      const apply_on = tr_elements[i].children[5].children[0].value;
+      const status = getButtonStatus(tr_elements[i].children[6].children[0]);
+      headers.push({url_contains:url_contains,action:action,header_name:header_name,header_value:header_value,comment:comment,apply_on:apply_on,status:status});
+    }
   }
   if (document.getElementById("debug_mode").checked) debug_mode=true;
   if (document.getElementById("show_comments").checked) show_comments=true;
@@ -281,13 +314,21 @@ function isTargetValid(target) {
   return true;
 }
 
+function selectAll() {
+  check_all=!check_all;
+  let buttons = document.querySelectorAll("#config_tab tr td > [title='Select rule']");
+  for (let i=0;i<buttons.length;i++) {
+	setCheckButtonStatus(buttons[i],check_all ? "on" : "off");
+  }
+}
+
 /**
 *  save the data to the local storage and restart modify header
 * show a warning if url patterns are invalid
 **/
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
-  storeInBrowserStorage({config:create_configuration_data()},function() {
+  storeInBrowserStorage({config:create_configuration_data("save")},function() {
     chrome.runtime.sendMessage("reload");
   });
   return true;
@@ -298,7 +339,7 @@ function saveData() {
 **/
 function exportData() {
   // Create file data
-  let to_export= create_configuration_data();
+  let to_export= create_configuration_data("export");
 
   // Create file to save
   let a         = document.createElement('a');
@@ -314,20 +355,36 @@ function exportData() {
 }
 
 /**
-* Choose a file and import data from the choosen file
-*
+* Append data from file
+**/
+function appendData(evt) {
+  if (window.confirm("This will append data to your actual configuration, do you want to continue?")) {
+    import_flag=false;
+    openFile();
+  }
+}
+
+/**
+* Import data from file
 **/
 function importData(evt) {
-  // create an input field in the iframe
-  if (window.confirm("This will erase your actual configuration, do you want to continue ?")) {
-    let input = document.createElement("input");
-    input.type="file";
-    input.addEventListener('change', readSingleFile, false);
-    let myf = document.getElementById("download");
-    myf = myf.contentWindow.document || myf.contentDocument;
-    myf.body.appendChild(input);
-    input.click();
+  if (window.confirm("This will erase your actual configuration, do you want to continue?")) {
+    import_flag=true;
+    openFile();
   }
+}
+
+// Choose a file
+function openFile() {
+  // create an input field in the iframe
+  let input = document.createElement("input");
+  input.type="file";
+  input.accept=".conf";
+  input.addEventListener('change', readSingleFile, false);
+  let myf = document.getElementById("download");
+  myf = myf.contentWindow.document || myf.contentDocument;
+  myf.body.appendChild(input);
+  input.click();
 }
 
 /**
@@ -373,11 +430,26 @@ function loadConfiguration(configuration) {
     return;
   }
 
-  // store the conf in the local storage
-  storeInBrowserStorage({config:JSON.stringify(config)},function() {
-   // load the new conf
-   reloadConfigPage();
-  });
+  // append, not replace
+  if (!import_flag) {
+	loadFromBrowserStorage(['config'],function (result) {
+	  appConfig = JSON.parse(result.config);
+	  for (rule of config.headers) {
+		appConfig.headers.push(rule);
+	  }
+	  storeInBrowserStorage({config:JSON.stringify(appConfig)},function() {
+		reloadConfigPage();
+	  });
+	});
+  }
+  // replace
+  else {
+    // store the conf in the local storage
+    storeInBrowserStorage({config:JSON.stringify(config)},function() {
+      // load the new conf
+      reloadConfigPage();
+    });
+  }
 }
 
 function convertConfigurationFormat1dot0ToCurrentFormat(config) {
@@ -435,6 +507,7 @@ function deleteLine(line_number_to_delete) {
       document.getElementById("comment"+i).value = document.getElementById("comment"+j).value;
       setButtonStatus(document.getElementById("activate_button"+i),getButtonStatus(document.getElementById("activate_button"+j)));
       document.getElementById("apply_on"+i).value = document.getElementById("apply_on"+j).value;
+	  setCheckButtonStatus(document.getElementById("check_button"+i),getButtonStatus(document.getElementById("check_button"+j)));
     }
   }
 
@@ -458,6 +531,7 @@ function invertLine(line1, line2) {
   const comment1 = document.getElementById("comment"+line1).value;
   const select_status1 = getButtonStatus(document.getElementById("activate_button"+line1));
   const apply_on1 = document.getElementById("apply_on"+line1).value;
+  const check_status1 = getButtonStatus(document.getElementById("check_button"+line1));
 
   // Copy line 2 to line 1
   document.getElementById("select_action"+line1).value = document.getElementById("select_action"+line2).value;
@@ -467,6 +541,7 @@ function invertLine(line1, line2) {
   document.getElementById("comment"+line1).value = document.getElementById("comment"+line2).value;
   setButtonStatus(document.getElementById("activate_button"+line1),getButtonStatus(document.getElementById("activate_button"+line2)));
   document.getElementById("apply_on"+line1).value = document.getElementById("apply_on"+line2).value;
+  setCheckButtonStatus(document.getElementById("check_button"+line1),getButtonStatus(document.getElementById("check_button"+line2)));
 
   // Copy line 1 to line 2
   document.getElementById("select_action"+line2).value = select_action1;
@@ -476,6 +551,7 @@ function invertLine(line1, line2) {
   document.getElementById("comment"+line2).value = comment1;
   setButtonStatus(document.getElementById("activate_button"+line2),select_status1);
   document.getElementById("apply_on"+line2).value = apply_on1;
+  setCheckButtonStatus(document.getElementById("check_button"+line2),check_status1);
 }
 
 /**
