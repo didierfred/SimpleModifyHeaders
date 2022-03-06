@@ -10,7 +10,7 @@ To save and apply the modification, you need to click on the save button.
 
 It's possible to: 
 -  export the configuration into a file (json format)
--  import the configuration from a file. It supports the format of the Modifyheaders plugin
+-  import the configuration from a file. It supports the format of the Modifyheaders plugin. It is possible to append rules instead of replacing the configuration.
 
 ## Rules table
 The rules table contains lines with the following parameters:
@@ -20,6 +20,7 @@ The rules table contains lines with the following parameters:
 - comment: a comment 
 - apply on: "request" if the modification applies to the request headers or "response" if the modification applies to the response headers
 - status: on if the modification is active, off otherwise 
+- export: if set to value "To export" the rule is exported when using the export function 
 
 ## Url pattern
 We can choose the URLs on which the modifications are applied by modifying the URL pattern :  
