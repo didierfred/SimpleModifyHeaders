@@ -8,7 +8,6 @@
     "48": "icons/modify-48.png"
   },
   "permissions": [
-    "activeTab",
     "storage",
     "webRequest",
     "webRequestBlocking",
