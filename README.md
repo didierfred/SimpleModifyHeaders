@@ -1,4 +1,4 @@
-# SimpleModifyHeaders V 1.8.0
+# SimpleModifyHeaders V 1.8.1
 
 Extension for Firefox and Chrome. (The extension can be installed via [this link](https://addons.mozilla.org/firefox/addon/simple-modify-header/) for Firefox and via [this link](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic) for Chrome)
 
