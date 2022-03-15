@@ -274,7 +274,7 @@ function create_configuration_data(saveOrExport) {
   let debug_mode=false;
   let show_comments=false;
   for (let i=0;i<tr_elements.length;i++) {
-	if (saveOrExport=="save" || getButtonStatus(tr_elements[i].children[10].children[0])=="on") {
+	if (saveOrExport=="save" || getButtonStatus(tr_elements[i].children[7].children[0])=="on") {
       const url_contains = tr_elements[i].children[0].children[0].value;
       const action = tr_elements[i].children[1].children[0].value;
       const header_name = tr_elements[i].children[2].children[0].value;
@@ -341,6 +341,8 @@ function saveData() {
 function exportData() {
   // Create file data
   let to_export= create_configuration_data("export");
+
+  console.log("to_export = ", to_export);
 
   // Create file to save
   let a         = document.createElement('a');
