@@ -48,6 +48,8 @@ In order to work, the following browser permissions are needed for the extension
 - storage: needed to store the configuration and the rules
 - activeTab, tabs: needed to show the configuration screen in the browser tab.
 - webRequest, webRequestBlocking ,<all_urls>: needed to modify the headers according to the rules table. 
-  
+
+## Personal Information
+The extension does not collect personal information.
 ## License
 The code is Open Source under Mozilla Public License 2.0 
