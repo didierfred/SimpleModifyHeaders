@@ -7,6 +7,7 @@
   <link rel="shortcut icon" type="image/png" href="lib/jasmine-3.3.0/jasmine_favicon.png">
   <link rel="stylesheet" href="lib/jasmine-3.3.0/jasmine.css">
 
+  <script src="../popup/regexps.js"></script>
   <script src="../popup/config.js"></script>
 
 
@@ -17,7 +18,10 @@
   <!-- include source files here... -->
 
   <!-- include spec files here... -->
+
+  <script src="spec/RegexpsSpec.js"></script>
   <script src="spec/ConfigSpec.js"></script>
+
 
 </head>
 
@@ -49,6 +53,9 @@
 						<a href="#" id="import_button" class="btn btn-primary btn-sm" >
           						<span class="glyphicon glyphicon-import"></span> Import
         					</a>
+							<button type="button" id="append_button" class="btn btn-primary btn-sm">
+								<span class="glyphicon glyphicon-import"></span> Append
+					  </button>
 						<a href="#" id="parameters_button" class="btn btn-primary btn-sm"> 
           						<span class="glyphicon glyphicon-cog"></span> Parameters
         					</a>  
@@ -67,6 +74,7 @@
 						<th> Comment </th>
 						<th> Apply on </th>
 						<th> Status </th>
+						<th id="export_row_header" style="text-decoration: underline;">Export</th>
 						<th> </th>
 						<th> </th>
 						<th> </th>

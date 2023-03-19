@@ -1,6 +1,6 @@
 {
   "description": "Simple Modify headers ",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "simple-modify-headers",
   "version": "1.8.1",
   "homepage_url": "https://github.com/didierfred/SimpleModifyHeaders",
@@ -8,16 +8,18 @@
     "48": "icons/modify-48.png"
   },
   "permissions": [
-    "activeTab",
-    "tabs",
     "storage",
-    "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess"
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "tabs"
   ],
-  "host_permissions": [
-    "*://*/*"
-  ],
-  "action": {
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
     "default_icon": "icons/modify-32.png",
     "default_title": "Simple Modify Headers",
     "default_popup": "popup/menu.html"

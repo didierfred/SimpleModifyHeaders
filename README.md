@@ -39,6 +39,10 @@ The parameters button permits to:
 ## Firefox-specific issue
 According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exists, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add"
 
+## Chrome / Edge  specific issue 
+
+As a result of the Manifest V3 changes (https://developer.chrome.com/blog/resuming-the-transition-to-mv3?hl=en), individual cookie modification is no longer possible with Chromium-based browsers such as Chrome or Edge. Instead, cookies can now only be treated as a standard header, which can be created or removed. Consequently, the option to manage cookies has been discontinued starting from version 1.9.0 on these browsers.
+
 ## Limitation
 
 Due to limitations in the webRequest API of browsers, headers of requests, which are invoked by Javascript, could not be modified. 
@@ -51,5 +55,6 @@ In order to work, the following browser permissions are needed for the extension
 
 ## Personal Information
 The extension does not collect personal information.
+
 ## License
 The code is Open Source under Mozilla Public License 2.0 

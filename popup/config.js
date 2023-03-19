@@ -5,13 +5,17 @@
  * @author didierfred@gmail.com
  */
 
+
 let line_number;
 let started;
 let show_comments;
 let use_url_contains;
 let input_field_style;
 let check_all;
-let import_flag;
+let import_flag = true;
+let debug_mode = false;
+
+const useManifestV3 = (navigator.userAgent.toLowerCase().indexOf("chrome") !== -1);
 
 
 window.onload = function() {
@@ -22,8 +26,16 @@ function initConfigurationPage() {
 	initGlobalValue();
 	// load configuration from local storage
         loadFromBrowserStorage(['config'],function (result) {
-	  config = JSON.parse(result.config);
-	  if (config.debug_mode) document.getElementById("debug_mode").checked = true;
+
+    if (result.config === undefined)  config = getDefaultConfig();
+	  else {
+      config = JSON.parse(result.config);
+      if (useManifestV3) config = removeCookiesActionFromConfig(config); // in case config with cookie actions was saved before manifest V3
+    }
+	  if (config.debug_mode) {
+      document.getElementById("debug_mode").checked = true;
+      debug_mode=true;
+    }
 
 	  if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;
 	  else if (config.show_comments) document.getElementById("show_comments").checked = true;
@@ -55,8 +67,16 @@ function initConfigurationPage() {
 
 	  document.getElementById('show_comments').addEventListener('click',function (e) {showCommentsClick();});
 	  document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
+    document.getElementById('debug_mode').addEventListener('click',function (e) {clickOnDebugCheckBox();});
 	  reshapeTable();
         });
+}
+
+function getDefaultConfig() {
+  console.log("Load default config");
+  let headers = [];
+  headers.push({ url_contains: "", action: "add", header_name: "test-header-name", header_value: "test-header-value", comment: "test", apply_on: "req", status: "on" });
+  return { format_version: "1.2", target_page: "https://httpbin.org/*", headers: headers, debug_mode: false, use_url_contains: false };
 }
 
 function initGlobalValue()
@@ -79,8 +99,8 @@ function storeInBrowserStorage(item,callback_function)  {
   chrome.storage.local.set(item,callback_function);
 }
 
-function log(message) {
-  console.log(new Date() + " SimpleModifyHeader : " + message);
+function debug(message) {
+  if (debug_mode) console.log(new Date() + " SimpleModifyHeader : " + message);
 }
 
 /** PARAMETERS SCREEN MANAGEMENT **/
@@ -107,6 +127,11 @@ function useUrlContainsClick() {
   reshapeTable();
 }
 
+function clickOnDebugCheckBox() {
+  if (document.getElementById('debug_mode').checked) debug_mode=true;
+  else debug_mode=false;
+}
+
 /** END PARAMETERS SCREEN MANAGEMENT **/
 
 
@@ -123,9 +148,13 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
       <select class="form_control select_field" id="select_action${line_number}"> disable="false">
         <option value="add">Add</option>
         <option value="modify">Modify</option>
-        <option value="delete">Delete</option>
+        <option value="delete">Delete</option>`;
+    if (!useManifestV3) { // Not available in Manifest V3
+      html += `
         <option value="cookie_add_or_modify">Cookie Add/Modify</option>
-        <option value="cookie_delete">Cookie Delete</option>
+        <option value="cookie_delete">Cookie Delete</option> `;
+    }
+    html += `
       </select>
     </td>
     <td>
@@ -290,6 +319,7 @@ function create_configuration_data(saveOrExport) {
   if (document.getElementById("use_url_contains").checked) use_url_contains=true;
   let to_export = {format_version:"1.2",target_page:document.getElementById('targetPage').value,headers:headers,
 				  debug_mode:debug_mode,show_comments:show_comments,use_url_contains:use_url_contains};
+  debug("createConfigData" + JSON.stringify(to_export));
   return JSON.stringify(to_export);
 }
 
@@ -330,7 +360,8 @@ function switchAllExportButtons() {
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
   storeInBrowserStorage({config:create_configuration_data("save")},function() {
-    chrome.runtime.sendMessage("reload");
+    if (useManifestV3) applyConfigWithManifestV3();
+    else chrome.runtime.sendMessage("reload");
   });
   return true;
 }
@@ -342,7 +373,7 @@ function exportData() {
   // Create file data
   let to_export= create_configuration_data("export");
 
-  console.log("to_export = ", to_export);
+  debug("to_export = " + JSON.stringify(to_export));
 
   // Create file to save
   let a         = document.createElement('a');
@@ -425,6 +456,8 @@ function loadConfiguration(configuration) {
         alert("Invalid file format");
 	return;
       }
+
+    if (useManifestV3)  config = removeCookiesActionFromConfig(config);
     }
   }
   catch(error) {
@@ -491,8 +524,21 @@ function convertHistoricalModifyHeaderFormatToCurrentFormat(config) {
   return {format_version:"1.2",target_page:"",headers:headers,debug_mode:false,show_comments:true,use_url_contains:false};
 }
 
+function removeCookiesActionFromConfig(config) {
+  let headers = [];
+  for (let line of config.headers) {
+    if (line.action !== "cookie_add_or_modify" && line.action !== "cookie_delete") {
+      headers.push(line);
+    }
+  }
+  config.headers = headers;
+  return config;
+}
+
 function reloadConfigPage() {
-  chrome.runtime.sendMessage("reload");
+  if (useManifestV3) applyConfigWithManifestV3();
+  else chrome.runtime.sendMessage("reload");
+
   document.location.href="config.html";
   }
 
@@ -561,19 +607,102 @@ function invertLine(line1, line2) {
 * Stop or Start modify header
 **/
 function startModify() {
-  if (started==="off") {
-      saveData();
-      storeInBrowserStorage({started:'on'},function() {
-        chrome.runtime.sendMessage("on");
-        started = "on";
-        document.getElementById("start_img").src = "img/stop.png";
-      });
-  }
-  else {
-    storeInBrowserStorage({started:'off'},function() {
-      chrome.runtime.sendMessage("off");
+  if (started === "off") {
+    saveData();
+    storeInBrowserStorage({ started: "on" }, function () {
+      started = "on";
+      document.getElementById("start_img").src = "img/stop.png";
+      if (useManifestV3) applyConfigWithManifestV3();
+      else chrome.runtime.sendMessage("on");
+    });
+  } else {
+    storeInBrowserStorage({ started: "off" }, function () {
       started = "off";
       document.getElementById("start_img").src = "img/start.png";
+      if (useManifestV3) removeConfigWithManifestV3();
+      else chrome.runtime.sendMessage("off");
     });
   }
 }
+
+function applyConfigWithManifestV3() {
+  if (started === "on")
+    removeConfigWithManifestV3(() =>
+      loadFromBrowserStorage(["config"], function (result) {
+        const config = JSON.parse(result.config);
+        if (!config.headers) return;
+
+        debug("Load config :"+ JSON.stringify(config));
+
+        const rules = new Array();
+        let ruleId = 1;
+        config.headers.forEach((header) => {
+          if (header.status === "on") {
+            convertConfigLineAsRules(
+              config.target_page,
+              config.use_url_contains,
+              header
+            ).forEach((rule) => {
+              rule.id = ruleId;
+              rules.push(rule);
+              ruleId++;
+            });
+          }
+        });
+        debug ("Add rules : " + JSON.stringify(rules));
+        chrome.declarativeNetRequest.updateDynamicRules({ addRules: rules });
+      })
+    );
+}
+
+function convertConfigLineAsRules(target_page, use_url_contains, header) {
+  if (header.header_name == "") return [];
+  let rules = new Array();
+  let regexps = new Array();
+  if (use_url_contains)
+    regexps = getRegExpFromConfig(target_page, header.url_contains);
+  else regexps = getRegExpFromConfig(target_page);
+
+  regexps.forEach((regexp) => {
+    const rule = {
+      priority: 2,
+      action: {
+        type: "modifyHeaders",
+      },
+      condition: { regexFilter: regexp, resourceTypes: ["main_frame"] },
+    };
+
+    const ruleHeaders = [{ header: header.header_name }];
+    if (header.apply_on === "res") rule.action.responseHeaders = ruleHeaders;
+    else rule.action.requestHeaders = ruleHeaders;
+
+    if (header.action === "delete") ruleHeaders[0].operation = "remove";
+    else {
+      ruleHeaders[0].operation = "set";
+      ruleHeaders[0].value = header.header_value;
+    }
+    rules.push(rule);
+  });
+
+  return rules;
+}
+
+
+
+function removeConfigWithManifestV3(callback) {
+  chrome.declarativeNetRequest.getDynamicRules(function (Rules) {
+    if (!!Rules) {
+      const rulesToDelete = new Array();
+      Rules.forEach((rule) => {
+        rulesToDelete.push(rule.id);
+      });
+      debug("Delete rules "+ JSON.stringify(Rules));
+      chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: rulesToDelete
+      }, callback);
+    }
+  });
+}
+
+
+

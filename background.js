@@ -335,27 +335,12 @@ function notify(message) {
 function addListener() {
   let target = config.target_page.replaceAll(' ',''); 
   if ((target === "*") || (target === "")) target = "<all_urls>";
-
-  // need to had "extraHeaders" option for chrome https://developer.chrome.com/extensions/webRequest#life_cycle_footnote
-  if (isChrome) {
-    chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
-      { urls: target.split(";") },
-      ["blocking", "requestHeaders", "extraHeaders"]);
-
-    chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
-      { urls: target.split(";") },
-      ["blocking", "responseHeaders", "extraHeaders"]);
-  }
-
-  else {
-    chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
-      { urls: target.split(";") },
-      ["blocking", "requestHeaders"]);
-    chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
-      { urls: target.split(";") },
-      ["blocking", "responseHeaders"]);
-  }
-
+  chrome.webRequest.onBeforeSendHeaders.addListener(rewriteRequestHeader,
+    { urls: target.split(";") },
+    ["blocking", "requestHeaders"]);
+  chrome.webRequest.onHeadersReceived.addListener(rewriteResponseHeader,
+    { urls: target.split(";") },
+    ["blocking", "responseHeaders"]);
 }
 
 
