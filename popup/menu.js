@@ -49,7 +49,7 @@ function reloadConfigTab(tabs)  {
   var config_tab;
   // search for config tab
   for (let tab of tabs)  {
-    if (tab.url.startsWith(chrome.extension.getURL(""))) config_tab = tab;
+    if (tab.url.startsWith(chrome.runtime.getURL(""))) config_tab = tab;
   }
   // config tab exists , reload it
   if (config_tab) chrome.tabs.reload(config_tab.id);
@@ -63,7 +63,7 @@ function loadConfigTab(tabs)  {
   var config_tab;
   // search for config tab
   for (let tab of tabs)  {
-    if (tab.url.startsWith(chrome.extension.getURL(""))) config_tab = tab;
+    if (tab.url.startsWith(chrome.runtime.getURL(""))) config_tab = tab;
   }
   // config tab exits , put the focus on it
   if (config_tab) chrome.tabs.update(config_tab.id,{active:true})

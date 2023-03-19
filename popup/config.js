@@ -11,7 +11,7 @@ let show_comments;
 let use_url_contains;
 let input_field_style;
 let check_all;
-let import_flag;
+const isBrowserChromiumBased = (navigator.userAgent.toLowerCase().indexOf("chrome") !== -1);
 
 
 window.onload = function() {
@@ -22,7 +22,9 @@ function initConfigurationPage() {
 	initGlobalValue();
 	// load configuration from local storage
         loadFromBrowserStorage(['config'],function (result) {
-	  config = JSON.parse(result.config);
+
+    if (result.config === undefined)  config = getDefaultConfig();
+	  else config = JSON.parse(result.config);
 	  if (config.debug_mode) document.getElementById("debug_mode").checked = true;
 
 	  if (typeof config.show_comments === 'undefined') document.getElementById("show_comments").checked = true;
@@ -57,6 +59,13 @@ function initConfigurationPage() {
 	  document.getElementById('use_url_contains').addEventListener('click',function (e) {useUrlContainsClick();});
 	  reshapeTable();
         });
+}
+
+function getDefaultConfig() {
+  console.log("Load default config");
+  let headers = [];
+  headers.push({ url_contains: "", action: "add", header_name: "test-header-name", header_value: "test-header-value", comment: "test", apply_on: "req", status: "on" });
+  return { format_version: "1.2", target_page: "https://httpbin.org/*", headers: headers, debug_mode: false, use_url_contains: false };
 }
 
 function initGlobalValue()
@@ -290,6 +299,7 @@ function create_configuration_data(saveOrExport) {
   if (document.getElementById("use_url_contains").checked) use_url_contains=true;
   let to_export = {format_version:"1.2",target_page:document.getElementById('targetPage').value,headers:headers,
 				  debug_mode:debug_mode,show_comments:show_comments,use_url_contains:use_url_contains};
+ console.log("createConfigData",to_export);
   return JSON.stringify(to_export);
 }
 
@@ -330,7 +340,8 @@ function switchAllExportButtons() {
 function saveData() {
   if (!isTargetValid(document.getElementById('targetPage').value)) alert("Warning: Url patterns are invalid");
   storeInBrowserStorage({config:create_configuration_data("save")},function() {
-    chrome.runtime.sendMessage("reload");
+  if (!isBrowserChromiumBased) chrome.runtime.sendMessage("reload");
+  else applyConfig();
   });
   return true;
 }
@@ -492,7 +503,9 @@ function convertHistoricalModifyHeaderFormatToCurrentFormat(config) {
 }
 
 function reloadConfigPage() {
-  chrome.runtime.sendMessage("reload");
+  if (!isBrowserChromiumBased) chrome.runtime.sendMessage("reload");
+  else applyConfig();
+
   document.location.href="config.html";
   }
 
@@ -561,19 +574,172 @@ function invertLine(line1, line2) {
 * Stop or Start modify header
 **/
 function startModify() {
-  if (started==="off") {
+  if (isBrowserChromiumBased) startModifyWithManifestV3();
+  else {
+    if (started === "off") {
       saveData();
-      storeInBrowserStorage({started:'on'},function() {
+      storeInBrowserStorage({ started: "on" }, function () {
         chrome.runtime.sendMessage("on");
         started = "on";
         document.getElementById("start_img").src = "img/stop.png";
       });
+    } else {
+      storeInBrowserStorage({ started: "off" }, function () {
+        chrome.runtime.sendMessage("off");
+        started = "off";
+        document.getElementById("start_img").src = "img/start.png";
+      });
+    }
+  }
+}
+
+/**
+* Stop or Start modify header
+**/
+function startModifyWithManifestV3() {
+  if (started==="off") {
+      saveData();
+      storeInBrowserStorage({started:'on'},function() {
+        started = "on";
+        document.getElementById("start_img").src = "img/stop.png";
+        applyConfig();
+      });
   }
   else {
     storeInBrowserStorage({started:'off'},function() {
-      chrome.runtime.sendMessage("off");
       started = "off";
       document.getElementById("start_img").src = "img/start.png";
+      removeConfig();
     });
   }
 }
+
+function applyConfig() {
+  if (started === "on")
+    removeConfig(() =>
+      loadFromBrowserStorage(["config"], function (result) {
+        const config = JSON.parse(result.config);
+        if (!config.headers) return;
+
+        console.log("Apply config", config);
+
+        const rules = new Array();
+        let ruleId = 1;
+        config.headers.forEach((header) => {
+          if (header.status === "on") {
+            convertConfigLineAsRules(
+              config.target_page,
+              config.use_url_contains,
+              header
+            ).forEach((rule) => {
+              rule.id = ruleId;
+              rules.push(rule);
+              ruleId++;
+            });
+          }
+        });
+        console.log("will add rules ", rules );
+        chrome.declarativeNetRequest.updateDynamicRules({ addRules: rules });
+      })
+    );
+}
+
+function convertConfigLineAsRules(target_page, use_url_contains, header) {
+  let rules = new Array();
+  let regexps = new Array();
+  if (use_url_contains)
+    regexps = getRegExpFromConfig(target_page, header.url_contains);
+  else regexps = getRegExpFromConfig(target_page);
+
+  regexps.forEach((regexp) => {
+    const rule = {
+      priority: 2,
+      action: {
+        type: "modifyHeaders",
+      },
+      condition: { regexFilter: regexp, resourceTypes: ["main_frame"] },
+    };
+
+    const ruleHeaders = [{ header: header.header_name }];
+    if (header.apply_on === "res") rule.action.responseHeaders = ruleHeaders;
+    else rule.action.requestHeaders = ruleHeaders;
+
+    if (header.action === "delete") ruleHeaders[0].operation = "remove";
+    else {
+      ruleHeaders[0].operation = "set";
+      ruleHeaders[0].value = header.header_value;
+    }
+    rules.push(rule);
+  });
+
+  return rules;
+}
+
+function getRegExpFromConfig(target_page, url_contains) {
+  const regexps = new Array();
+  if (url_contains)
+    url_contains = url_contains.trim();
+  target_page.split(";").forEach((page) => {
+    let regexp =  page.trim();
+   
+    if (url_contains && url_contains.length > 0) {
+      regexp = processUrlContains(regexp,url_contains);
+      if (regexp.length === 0) return;
+    }
+    regexp = escapeRegexpMetaCharacters(regexp);
+    if (!regexp.endsWith(".*")) regexp += "$";
+    console.log("regexp = ", regexp);
+    regexps.push(regexp);
+  });
+  return regexps;
+}
+
+function escapeRegexpMetaCharacters(aString) {
+  return aString
+    .replaceAll(".", "\\.")
+    .replaceAll("*", ".*")
+    .replaceAll("?", "\\?")
+    .replaceAll("+", "\\+");
+}
+
+function processUrlContains(page, url_contains) {
+  
+  if (page.includes(url_contains)) return page;
+  if (page.indexOf('*')===-1) return "";
+
+  let regexp = "";
+  let elements = new Array();
+  for (let i = 0; i < page.length; i++) {
+    if (page.charAt(i) === "*") {
+      elements.push(
+        page.slice(0, i) + "*" + url_contains + "*" + page.slice(i + 1)
+      );
+    }
+  }
+  
+  elements.forEach((elem, index) => {
+    if (index > 0) regexp += "|";
+    regexp += elem;
+  });
+  console.log("🚀 ~ file: config.js ~ line 720 ~ elements.forEach ~ elements", elements)
+  return regexp;
+}
+
+
+function removeConfig(callback) {
+  chrome.declarativeNetRequest.getDynamicRules(function (Rules) {
+    if (!!Rules) {
+      const rulesToDelete = new Array();
+      Rules.forEach((rule) => {
+        rulesToDelete.push(rule.id);
+      });
+      console.log("Delete rules ",Rules);
+      chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: rulesToDelete
+      }, callback);
+    }
+  });
+}
+
+
+
