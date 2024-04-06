@@ -126,6 +126,7 @@ function appendLine(url_contains,action,header_name,header_value,comment,apply_o
         <option value="delete">Delete</option>
         <option value="cookie_add_or_modify">Cookie Add/Modify</option>
         <option value="cookie_delete">Cookie Delete</option>
+	<option value="replace_value">Replace String In Response Value</option>
       </select>
     </td>
     <td>
