@@ -288,6 +288,31 @@ function rewriteResponseHeader(e) {
           if (config.debug_mode) log("cookie_delete.resp delete_header : name=" + to_modify.header_name + " for url " + e.url);
         }
       }
+      else if (to_modify.action === "replace_value") {
+        for (let header of e.responseHeaders) {
+          if (header.name.toLowerCase() === to_modify.header_name.toLowerCase()) {
+      			let replacePattern = to_modify.header_value;
+      			let originalValue = header.value;
+      
+      			let match = replacePattern.match(/\((.*?)\)\((.*?)\)/);
+      			let searchString = match[1]; // What to search for in the original value
+      			let replaceString = match[2]; // What to replace with in the original value, to create the new value
+      
+      			let regex = new RegExp(searchString, "g");
+      			let newValue = originalValue.replace(regex, replaceString);			
+      			
+      			if (config.debug_mode) log(
+              "Replace value in response header :  name= " + to_modify.header_name +
+              ",old value=" + originalValue + 
+              ",replace pattern=" + replacePattern +
+              ",new value=" + newValue + 
+              " for url " + e.url
+            );	
+            
+      			header.value = newValue; 			  
+          }
+        }
+      }
     }
   }
   if (config.debug_mode) log("End modify response headers for url " + e.url);
