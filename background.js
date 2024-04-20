@@ -186,7 +186,8 @@ function rewriteRequestHeader(e) {
         if (
             to_modify.status === 'on' &&
             to_modify.apply_on === 'req' &&
-            (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains.trim())))
+            (!config.use_url_contains ||
+                (config.use_url_contains && doesUrlContainsAnUrlContains(e.url, to_modify.url_contains)))
         ) {
             if (to_modify.action === 'add') {
                 let new_header = {name: to_modify.header_name, value: to_modify.header_value};
@@ -277,6 +278,18 @@ function rewriteRequestHeader(e) {
     return {requestHeaders: e.requestHeaders};
 }
 
+function doesUrlContainsAnUrlContains(url, url_contains) {
+    if (url_contains === undefined || url_contains === '') return true;
+    url_contains = url_contains.trim();
+    if (url_contains.includes(';')) {
+        let url_contains_array = url_contains.split(';');
+        for (let i = 0; i < url_contains_array.length; i++) {
+            if (url_contains_array[i].length > 0 && url.includes(url_contains_array[i])) return true;
+        }
+        return false;
+    }
+    return url.includes(url_contains);
+};
 /*
  * Rewrite the response header (add , modify or delete)
  *
@@ -287,7 +300,7 @@ function rewriteResponseHeader(e) {
         if (
             to_modify.status === 'on' &&
             to_modify.apply_on === 'res' &&
-            (!config.use_url_contains || (config.use_url_contains && e.url.includes(to_modify.url_contains.trim())))
+            (!config.use_url_contains || (config.use_url_contains && doesUrlContainsAnUrlContains(e.url, to_modify.url_contains)))
         ) {
             if (to_modify.action === 'add') {
                 let new_header = {name: to_modify.header_name, value: to_modify.header_value};

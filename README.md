@@ -33,7 +33,7 @@ We can choose the URLs on which the modifications are applied by modifying the U
 The parameters button permits to:
 - Activate debug mode: shows detailed log messages in the extension debugging console of the browser.
 - Show comments: show comments field on the config panel 
-- Filter URL by rules: activate the possibility to filter URL for each rule in the config panel. The header field will be modified only if the URL contains the configured value.
+- Filter URL by rules: activate the possibility to filter URL for each rule in the config panel. The header field will be modified only if the URL contains one of the configured values (using semicolon as separator)
 
 
 ## Firefox-specific issue
@@ -42,6 +42,8 @@ According to the version of Firefox, the addition of a new header behaves differ
 ## Chrome / Edge  specific issue 
 
 As a result of the Manifest V3 changes (https://developer.chrome.com/blog/resuming-the-transition-to-mv3?hl=en), individual cookie modification is no longer possible with Chromium-based browsers such as Chrome or Edge. Instead, cookies can now only be treated as a standard header, which can be created or removed. Consequently, the option to manage cookies has been discontinued starting from version 1.9.0 on these browsers.
+
+A second consequence of Manifest V3 is that the add or modify option behave the same (the modify option )
 
 ## Limitation
 

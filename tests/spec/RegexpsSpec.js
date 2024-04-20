@@ -23,20 +23,23 @@ describe('Regexps', function () {
         const testCases = [
             {target_page: '', url_contains: 'test', expected: ['.*test.*']},
             {target_page: 'http://test', url_contains: 'test', expected: ['http://test$']},
+            {target_page: 'http://test', url_contains: 'other;test', expected: ['http://test$']},
             {target_page: 'http://myurl', url_contains: 'test', expected: []}, // no match possible
             {target_page: 'http://*', url_contains: 'te$st', expected: ['http://.*te\\$st.*']},
             {target_page: 'http://*', url_contains: 'te*st', expected: ['http://.*te\\*st.*']},
-            {target_page: 'http://*/*', url_contains: 'test', expected: ['http://.*test.*/.*|http://.*/.*test.*']},
+            {target_page: 'http://*/*', url_contains: 'test', expected: ['http://.*test.*/.*','http://.*/.*test.*']},
+            {target_page: 'http://*/*', url_contains: 'test;other', expected: ['http://.*(test|other).*/.*','http://.*/.*(test|other).*']},
+            {target_page: 'http://*/*', url_contains: 'test;other;third', expected: ['http://.*(test|other|third).*/.*','http://.*/.*(test|other|third).*']},
             {
                 target_page: 'http://*/*',
                 url_contains: 'te+st',
-                expected: ['http://.*te\\+st.*/.*|http://.*/.*te\\+st.*']
+                expected: ['http://.*te\\+st.*/.*','http://.*/.*te\\+st.*']
             },
             {
                 target_page: 'http://*value/*value/*value',
                 url_contains: 'test',
                 expected: [
-                    'http://.*test.*value/.*value/.*value$|http://.*value/.*test.*value/.*value$|http://.*value/.*value/.*test.*value$'
+                    'http://.*test.*value/.*value/.*value$','http://.*value/.*test.*value/.*value$','http://.*value/.*value/.*test.*value$'
                 ]
             }
         ];

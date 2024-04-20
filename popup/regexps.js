@@ -7,44 +7,55 @@ function getRegExpFromConfig(target_page, url_contains) {
     target_page = removeConsecutiveChar(target_page, ';');
     target_page = removeLastChar(target_page, ';');
     target_page.split(';').forEach((page) => {
-        let regexp = page.trim();
-        regexp = buildRegexForOneTargetPage(regexp, url_contains);
-        if (regexp != null) regexps.push(regexp);
+        
+        let regexpsForOneTargetPage = buildRegexpsForOneTargetPage( page.trim(), url_contains);
+        if (regexpsForOneTargetPage != null) {
+            regexpsForOneTargetPage.forEach((elem) => {
+                regexps.push(elem);
+            });
+        }
     });
     return regexps;
 }
 
-function buildRegexForOneTargetPage(page, url_contains) {
+function buildRegexpsForOneTargetPage(page, url_contains) {
     page = removeConsecutiveChar(page, '*');
     page = setWildCardsForRegexp(page);
-    if (!url_contains || url_contains.length === 0 || page.includes(url_contains)) {
+    if (!url_contains || url_contains.length === 0) {
         if (!page.endsWith('*')) page += '$';
-        return page;
+        return [page];
     }
     url_contains = escapeRegexpMetaCharacters(url_contains);
     url_contains = url_contains.replaceAll('*', '\\*');
+    url_contains = removeConsecutiveChar(url_contains, ';');
+    url_contains = removeLastChar(url_contains, ';');
+
     if (page.indexOf('*') === -1) {
-        if (page.includes(url_contains)) {
-            return page;
-        } else return undefined;
+        isUrl_containsInPage = false;
+        url_contains.split(';').forEach((elem) => {
+            if (page.includes(elem)) isUrl_containsInPage = true;
+        });
+        if (isUrl_containsInPage) {
+            if (!page.endsWith('*')) page += '$';
+            return [page];
+        } else return null;
     }
 
-    let regexp = '';
-    let elements = new Array();
+    if (url_contains.includes(';')) {
+        url_contains = url_contains.replaceAll(';', '|');
+        url_contains = '(' + url_contains + ')';
+    }
+
+    let regexps = new Array();
     for (let i = 0; i < page.length; i++) {
         if (page.charAt(i) === '*') {
-            elements.push(page.slice(0, i) + '*' + url_contains + '.*' + page.slice(i + 1));
+            regexp = page.slice(0, i) + '*' + url_contains + '.*' + page.slice(i + 1);
+            if (!regexp.endsWith('*')) regexp += '$';
+            regexps.push(regexp);
         }
     }
 
-    elements.forEach((elem, index) => {
-        if (index > 0) {
-            regexp += '|';
-        }
-        regexp += elem;
-        if (!regexp.endsWith('*')) regexp += '$';
-    });
-    return regexp;
+    return regexps;
 }
 
 function removeConsecutiveChar(str, char) {
