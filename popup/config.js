@@ -757,7 +757,26 @@ function convertConfigLineAsRules(target_page, use_url_contains, header) {
             action: {
                 type: 'modifyHeaders'
             },
-            condition: {urlFilter: pattern, resourceTypes: ['main_frame']}
+            condition: {
+                urlFilter: pattern,
+                resourceTypes: [
+                    'main_frame',
+                    'sub_frame',
+                    'stylesheet',
+                    'script',
+                    'image',
+                    'font',
+                    'object',
+                    'xmlhttprequest',
+                    'ping',
+                    'csp_report',
+                    'media',
+                    'websocket',
+                    'webtransport',
+                    'webbundle',
+                    'other'
+                ]
+            }
         };
 
         const ruleHeaders = [{header: header.header_name}];
