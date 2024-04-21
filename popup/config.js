@@ -734,7 +734,12 @@ function applyConfigWithManifestV3() {
                     }
                 });
                 debug('Add rules : ' + JSON.stringify(rules));
-                chrome.declarativeNetRequest.updateDynamicRules({addRules: rules});
+                debug('Rules number: ' + rules.length);
+                if (rules.length >= chrome.declarativeNetRequest.MAX_NUMBER_OF_UNSAFE_DYNAMIC_RULES)
+                    alert(
+                        'You\'ve reached the maximum number of url filtered allowed by the browser. Please disable some rules or remove some "url contains".'
+                    );
+                else chrome.declarativeNetRequest.updateDynamicRules({addRules: rules});
             })
         );
 }
@@ -742,17 +747,17 @@ function applyConfigWithManifestV3() {
 function convertConfigLineAsRules(target_page, use_url_contains, header) {
     if (header.header_name == '') return [];
     let rules = new Array();
-    let regexps = new Array();
-    if (use_url_contains) regexps = getRegExpFromConfig(target_page, header.url_contains);
-    else regexps = getRegExpFromConfig(target_page);
+    let patterns = new Array();
+    if (use_url_contains) patterns = getPatternMatchingFromConfig(target_page, header.url_contains);
+    else patterns = getPatternMatchingFromConfig(target_page);
 
-    regexps.forEach((regexp) => {
+    patterns.forEach((pattern) => {
         const rule = {
             priority: 2,
             action: {
                 type: 'modifyHeaders'
             },
-            condition: {regexFilter: regexp, resourceTypes: ['main_frame']}
+            condition: {urlFilter: pattern, resourceTypes: ['main_frame']}
         };
 
         const ruleHeaders = [{header: header.header_name}];

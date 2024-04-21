@@ -1,61 +1,51 @@
-function getRegExpFromConfig(target_page, url_contains) {
+function getPatternMatchingFromConfig(target_page, url_contains) {
     if (target_page.trim() === '') target_page = '*';
-    else target_page = escapeRegexpMetaCharacters(target_page);
 
-    const regexps = new Array();
+    const patterns = new Array();
     if (url_contains) url_contains = url_contains.trim();
     target_page = removeConsecutiveChar(target_page, ';');
     target_page = removeLastChar(target_page, ';');
     target_page.split(';').forEach((page) => {
-        
-        let regexpsForOneTargetPage = buildRegexpsForOneTargetPage( page.trim(), url_contains);
-        if (regexpsForOneTargetPage != null) {
-            regexpsForOneTargetPage.forEach((elem) => {
-                regexps.push(elem);
+        let patternsForOneTargetPage = getPatternMatchingForOneTargetPage(page.trim(), url_contains);
+        if (patternsForOneTargetPage != null) {
+            patternsForOneTargetPage.forEach((elem) => {
+                patterns.push(elem);
             });
         }
     });
-    return regexps;
+    return patterns;
 }
 
-function buildRegexpsForOneTargetPage(page, url_contains) {
+function getPatternMatchingForOneTargetPage(page, url_contains) {
     page = removeConsecutiveChar(page, '*');
-    page = setWildCardsForRegexp(page);
     if (!url_contains || url_contains.length === 0) {
-        if (!page.endsWith('*')) page += '$';
+        if (!page.endsWith('*')) page += '|';
         return [page];
     }
-    url_contains = escapeRegexpMetaCharacters(url_contains);
-    url_contains = url_contains.replaceAll('*', '\\*');
     url_contains = removeConsecutiveChar(url_contains, ';');
     url_contains = removeLastChar(url_contains, ';');
 
-    if (page.indexOf('*') === -1) {
-        isUrl_containsInPage = false;
-        url_contains.split(';').forEach((elem) => {
-            if (page.includes(elem)) isUrl_containsInPage = true;
-        });
-        if (isUrl_containsInPage) {
-            if (!page.endsWith('*')) page += '$';
-            return [page];
-        } else return null;
-    }
+    isUrl_containsInPage = false;
+    url_contains.split(';').forEach((elem) => {
+        if (page.includes(elem)) isUrl_containsInPage = true;
+    });
+    if (isUrl_containsInPage) {
+        if (!page.endsWith('*')) page += '|';
+        return [page];
+    } else if (page.indexOf('*') === -1) return null;
 
-    if (url_contains.includes(';')) {
-        url_contains = url_contains.replaceAll(';', '|');
-        url_contains = '(' + url_contains + ')';
-    }
-
-    let regexps = new Array();
-    for (let i = 0; i < page.length; i++) {
-        if (page.charAt(i) === '*') {
-            regexp = page.slice(0, i) + '*' + url_contains + '.*' + page.slice(i + 1);
-            if (!regexp.endsWith('*')) regexp += '$';
-            regexps.push(regexp);
+    let patterns = new Array();
+    url_contains.split(';').forEach((elem) => {
+        for (let i = 0; i < page.length; i++) {
+            if (page.charAt(i) === '*') {
+                let pattern = page.slice(0, i) + '*' + elem + '*' + page.slice(i + 1);
+                if (!pattern.endsWith('*')) pattern += '|';
+                patterns.push(pattern);
+            }
         }
-    }
+    });
 
-    return regexps;
+    return patterns;
 }
 
 function removeConsecutiveChar(str, char) {
@@ -74,12 +64,4 @@ function removeLastChar(str, char) {
         return str.slice(0, str.length - 1);
     }
     return str;
-}
-
-function setWildCardsForRegexp(regexp) {
-    return regexp.replaceAll('*', '.*');
-}
-
-function escapeRegexpMetaCharacters(aString) {
-    return aString.replaceAll('.', '\\.').replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('$', '\\$');
 }
