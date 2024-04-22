@@ -1,33 +1,29 @@
 # SimpleModifyHeaders V 1.8.1
 
-Extension for Firefox and Chrome. (The extension can be installed via [this link](https://addons.mozilla.org/firefox/addon/simple-modify-header/) for Firefox and via [this link](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic) for Chrome)
+This extension, available for [Firefox](https://addons.mozilla.org/firefox/addon/simple-modify-header/) and [Chrome](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic), allows you to rewrite headers based on a rules table. 
 
-The extension rewrites the headers based on a rules table. 
+You can easily start and stop the extension using the button on the top right. Remember to click the save button to apply your modifications.
 
-The extension can be started and stopped via the button on the top right.
-
-To save and apply the modification, you need to click on the save button.
-
-It's possible to: 
--  export the configuration into a file (json format)
--  import the configuration from a file. It supports the format of the Modifyheaders plugin. It is possible to append rules instead of replacing the configuration.
-
+The extension also provides the ability to:
+- Export your configuration to a file (in JSON format)
+- Import your configuration from a file, supporting the Modifyheaders plugin format. You can choose to append rules instead of replacing the existing configuration.
+  
 ## Rules table
-The rules table contains lines with the following parameters:
-- action: add, modify or delete a header field or a cookie
-- header field name or cookie name
-- header field value or cookie value 
-- comment: a comment 
-- apply on: "request" if the modification applies to the request headers or "response" if the modification applies to the response headers
-- status: on if the modification is active, off otherwise 
-- export: if set to value "To export" the rule is exported when using the export function 
+
+The rules table consists of the following parameters:
+- `Action`: Specifies whether to add, modify, or delete a header field or cookie.
+- `Header Field Name`: The name of the header field or cookie.
+- `Header Field Value`: The value of the header field or cookie.
+- `Comment`: Any additional comments.
+- `Apply On`: Determines if the rule applies to request headers ("request") or response headers ("response").
+- `Status`: Indicates if the rule is active ("on") or inactive ("off").
+- `Export`: If set to "To export", the rule will be included when using the export function.
 
 ## Url pattern
 We can choose the URLs on which the modifications are applied by modifying the URL pattern :  
 - The URL pattern must follow the syntax defined by https://developer.chrome.com/extensions/match_patterns
 - Putting an empty string on the field will select all URLs
 - It's possible to select multiple URL patterns using a semicolon (;) separator
-- It's not possible to define a specific port number https://stackoverflow.com/questions/11425591/match-port-in-chrome-extension-pattern
 
 ## Parameters
 The parameters button permits to:
@@ -37,23 +33,39 @@ The parameters button permits to:
 
 
 ## Firefox-specific issue
-According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exists, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add"
+According to the version of Firefox, the addition of a new header behaves differently. In the latest version, when you choose the "add" action and the header exists, it appends the value, while in the old version, it replaces it. If you want to modify an exiting header, you should use "modify" instead of "add".
+
+It's not possible to define a specific port number in url pattern, https://stackoverflow.com/questions/11425591/match-port-in-chrome-extension-pattern
 
 ## Chrome / Edge  specific issue 
 
-As a result of the Manifest V3 changes (https://developer.chrome.com/blog/resuming-the-transition-to-mv3?hl=en), individual cookie modification is no longer possible with Chromium-based browsers such as Chrome or Edge. Instead, cookies can now only be treated as a standard header, which can be created or removed. Consequently, the option to manage cookies has been discontinued starting from version 1.9.0 on these browsers.
+The introduction of Manifest V3, mandatory on Chromium-based browsers starting approximately in june 2024, has imposed restrictions on header modifications (refer to [Chromium Blog](https://developer.chrome.com/blog/resuming-the-transition-to-mv3?hl=en)). Direct access to header  and custom request filtering are no longer possible. All modifications must now be done via the declarativeNetRequest API, which has its own limitations, including a cap on the number of filtering rules and the size of regular expressions.
 
-A second consequence of Manifest V3 is that the add or modify option behave the same (the modify option )
+Attempting to maintain similar behavior to Manifest V2 presents several challenges, resulting in the following issues:
 
-## Limitation
-
-Due to limitations in the webRequest API of browsers, headers of requests, which are invoked by Javascript, could not be modified. 
+- Individual cookie modification is no longer possible so the option to manage cookies has been removed.
+- The 'add' and 'modify' options behave identically (modifying a non-existing header will result in it being added).
+- You may reach the browser's maximum filtering rules limit. If this occurs, a message will prompt you to deactivate some rules. However, this issue should be rare.
+- The previous method of first filtering via global "URL patterns" followed by an "URL contains" filtering is no longer possible. Instead, multiple patterns are used for filtering. For example:
+  - `URL pattern = "http://*/*"` and `when URL contains = "test"` results in two rules: `http://*test*/*` and `http://*/*test*`.
+  - `URL pattern = "http://test/myurl*"` and `when URL contains = "test"` results in one rule: `http://test/myurl*`.
+  - `URL pattern = "http://te*/myurl*"` and `when URL contains = "test"` results in two rules: `http://te*test*/myurl*` and `http://te*/myurl*test*`. This accepts `http://tetest/myurl` but excludes `http://test/myurl`, which was valid with the Manifest V2 version.
   
-## Extension permissions
-In order to work, the following browser permissions are needed for the extension: 
-- storage: needed to store the configuration and the rules
-- activeTab, tabs: needed to show the configuration screen in the browser tab.
-- webRequest, webRequestBlocking ,<all_urls>: needed to modify the headers according to the rules table. 
+  
+## Extension Permissions
+
+The extension requires the following permissions to function properly:
+
+### Firefox 
+- `storage`: Stores the configuration and rules.
+- `activeTab`, `tabs`: Displays the configuration screen in the browser tab.
+- `webRequest`, `webRequestBlocking`, `<all_urls>`: Modifies headers based on the rules table.
+
+### Chrome & Edge 
+- `storage`: Stores the configuration and rules.
+- `activeTab`, `tabs`: Displays the configuration screen in the browser tab.
+- `declarativeNetRequest`, `declarativeNetRequestWithHostAccess`: Modifies headers based on the rules table.
+
 
 ## Personal Information
 The extension does not collect personal information.
