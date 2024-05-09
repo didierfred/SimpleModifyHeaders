@@ -6,6 +6,7 @@
  */
 
 var started = 'off';
+const debug_mode = false;
 
 window.onload = function () {
     document.getElementById('config').addEventListener('click', function (e) {
@@ -31,15 +32,25 @@ function storeInBrowserStorage(item, callback_function) {
 function start_modify() {
     if (started === 'off') {
         storeInBrowserStorage({started: 'on'}, function () {
-            chrome.runtime.sendMessage('on');
+            
             started = 'on';
+            if (useManifestV3) {
+                applyConfigWithManifestV3();
+            } else {
+                chrome.runtime.sendMessage('on');
+            }
             document.getElementById('start_stop').value = 'Stop';
             // if exists reload config tab , to get the start/stop information correct
             chrome.tabs.query({currentWindow: true}, reloadConfigTab);
         });
     } else {
         storeInBrowserStorage({started: 'off'}, function () {
+            
+            if (useManifestV3) {
+                removeConfigWithManifestV3(() => {});
+            } else {
             chrome.runtime.sendMessage('off');
+            }
             started = 'off';
             document.getElementById('start_stop').value = 'Start';
             // if exists reload config tab , to get the start/stop information correct

@@ -21,5 +21,8 @@
     "default_icon": "icons/modify-32.png",
     "default_title": "Simple Modify Headers",
     "default_popup": "popup/menu.html"
+  },
+  "background": {
+    "service_worker": "service-worker.js"
   }
 }
