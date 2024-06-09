@@ -2,7 +2,7 @@
   "description": "Simple Modify headers ",
   "manifest_version": 3,
   "name": "simple-modify-headers",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "homepage_url": "https://github.com/didierfred/SimpleModifyHeaders",
   "icons": {
     "48": "icons/modify-48.png"

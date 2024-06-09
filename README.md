@@ -1,4 +1,4 @@
-# SimpleModifyHeaders V 1.8.1
+# SimpleModifyHeaders V 1.9.0
 
 This extension, available for [Firefox](https://addons.mozilla.org/firefox/addon/simple-modify-header/) and [Chrome](https://chrome.google.com/webstore/detail/simple-modify-headers/gjgiipmpldkpbdfjkgofildhapegmmic), allows you to rewrite headers based on a rules table. 
 
