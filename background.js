@@ -230,7 +230,7 @@ function rewriteRequestHeader(e) {
                             'Delete request header :  name=' + to_modify.header_name.toLowerCase() + ' for url ' + e.url
                         );
                 }
-            } else if (to_modify.action === 'cookie_add_or_modify') {
+            } else if (to_modify.action === 'cookie_add') {
                 let header_cookie = e.requestHeaders.find((header) => header.name.toLowerCase() === 'cookie');
                 let new_cookie = cookie_keyvalues_set(
                     header_cookie === undefined ? '' : header_cookie.value,
@@ -241,16 +241,24 @@ function rewriteRequestHeader(e) {
                     e.requestHeaders.push({name: 'Cookie', value: new_cookie});
                     if (config.debug_mode)
                         log(
-                            'cookie_add_or_modify.req new_header : name=Cookie,value=' +
+                            'cookie_add.req new_header : name=Cookie,value=' +
                                 new_cookie +
                                 ' for url ' +
                                 e.url
                         );
-                } else {
+                }
+            } else if (to_modify.action === 'cookie_modify') {
+                let header_cookie = e.requestHeaders.find((header) => header.name.toLowerCase() === 'cookie');
+                let new_cookie = cookie_keyvalues_set(
+                    header_cookie === undefined ? '' : header_cookie.value,
+                    to_modify.header_name,
+                    to_modify.header_value
+                );
+                if (header_cookie != undefined) {
                     header_cookie.value = new_cookie;
                     if (config.debug_mode)
                         log(
-                            'cookie_add_or_modify.req modify_header : name=Cookie,value=' +
+                            'cookie_modify.req modify_header : name=Cookie,value=' +
                                 new_cookie +
                                 ' for url ' +
                                 e.url
@@ -346,7 +354,7 @@ function rewriteResponseHeader(e) {
                                 e.url
                         );
                 }
-            } else if (to_modify.action === 'cookie_add_or_modify') {
+            } else if (to_modify.action === 'cookie_add') {
                 let header_cookie = e.responseHeaders.find(
                     (header) =>
                         header.name.toLowerCase() === 'set-cookie' &&
@@ -362,21 +370,36 @@ function rewriteResponseHeader(e) {
                 );
                 if (header_cookie === undefined) {
                     log(
-                        "SimpleModifyHeaders.Warning: you're using cookie_add_or_modify in Response. While adding new cookie in response, this plugin only generates `Set-Cookie: cookie-name=cookie-value `, without ANY additional attributes. Add a `Set-Cookie` header if you need them. "
+                        "SimpleModifyHeaders.Warning: you're using cookie_add in Response. While adding new cookie in response, this plugin only generates `Set-Cookie: cookie-name=cookie-value `, without ANY additional attributes. Add a `Set-Cookie` header if you need them. "
                     );
                     e.responseHeaders.push({name: 'Set-Cookie', value: new_header_value});
                     if (config.debug_mode)
                         log(
-                            'cookie_add_or_modify.resp new_header : name=Cookie,value=' +
+                            'cookie_add.resp new_header : name=Cookie,value=' +
                                 new_header_value +
                                 ' for url ' +
                                 e.url
                         );
-                } else {
+                }
+            } else if (to_modify.action === 'cookie_modify') {
+                let header_cookie = e.responseHeaders.find(
+                    (header) =>
+                        header.name.toLowerCase() === 'set-cookie' &&
+                        header.value
+                            .toLowerCase()
+                            .trim()
+                            .startsWith(to_modify.header_name.toLowerCase() + '=')
+                );
+                let new_header_value = set_cookie_modify_cookie_value(
+                    header_cookie === undefined ? '' : header_cookie.value,
+                    to_modify.header_name,
+                    to_modify.header_value
+                );
+                if (header_cookie != undefined)
                     header_cookie.value = new_header_value;
                     if (config.debug_mode)
                         log(
-                            'cookie_add_or_modify.resp modify_header : name=Cookie,value=' +
+                            'cookie_modify.resp modify_header : name=Cookie,value=' +
                                 new_header_value +
                                 ' for url ' +
                                 e.url
