@@ -395,7 +395,7 @@ function rewriteResponseHeader(e) {
                     to_modify.header_name,
                     to_modify.header_value
                 );
-                if (header_cookie != undefined)
+                if (header_cookie != undefined) {
                     header_cookie.value = new_header_value;
                     if (config.debug_mode)
                         log(
