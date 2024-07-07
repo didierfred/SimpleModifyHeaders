@@ -116,6 +116,12 @@ function storeInBrowserStorage(item, callback_function) {
     chrome.storage.local.set(item, callback_function);
 }
 
+function hasCookieKey(cookie, key) {
+	let cookieArray = cookie.value.split(';').filter((e) => e.trim().length > 0);
+    let cookieKeyIndex = cookieArray.findIndex((kv) => kv.trim().startsWith(key + '='));
+    return cookieKeyIndex !== -1;
+}
+
 /*
  * This function set a key-value pair in HTTP header "Cookie",
  *   and returns the value of HTTP header after modification.
@@ -242,6 +248,15 @@ function rewriteRequestHeader(e) {
                     if (config.debug_mode)
                         log(
                             'cookie_add.req new_header : name=Cookie,value=' +
+                                new_cookie +
+                                ' for url ' +
+                                e.url
+                        );
+                } else if ( ! hasCookieKey(header_cookie, to_modify.header_name)) {
+                    header_cookie.value = new_cookie;
+                    if (config.debug_mode)
+                        log(
+                            'cookie_modify.req modify_header : name=Cookie,value=' +
                                 new_cookie +
                                 ' for url ' +
                                 e.url
