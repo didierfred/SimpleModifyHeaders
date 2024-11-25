@@ -190,7 +190,8 @@ function appendLine(url_contains, action, header_name, header_value, comment, ap
     if (!useManifestV3) {
         // Not available in Manifest V3
         html += `
-        <option value="cookie_add_or_modify">Cookie Add/Modify</option>
+        <option value="cookie_add">Cookie Add</option>
+	    <option value="cookie_modify">Cookie Modify</option>
         <option value="cookie_delete">Cookie Delete</option> `;
     }
     html += `
